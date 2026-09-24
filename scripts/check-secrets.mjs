@@ -25,6 +25,11 @@ try {
   ).trim();
   repositoryPresent = path.resolve(top).toLowerCase() === root.toLowerCase();
 } catch {
+  if (fs.existsSync(path.join(root, ".git"))) {
+    throw new Error(
+      "Git metadata exists but cannot be inspected. Resolve Git access or ownership before running this check; no audit was completed.",
+    );
+  }
   /* A pre-initialization audit uses isolated temporary Git metadata. */
 }
 

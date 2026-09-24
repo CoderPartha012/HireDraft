@@ -71,6 +71,7 @@ logs/
 .idea/
 .codex/
 .claude/
+[Cc][Ll][Aa][Uu][Dd][Ee]*.[Mm][Dd]
 .vercel/
 .DS_Store
 Thumbs.db
