@@ -1,0 +1,204 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#163c32">
+    <title>Analyze LinkedIn Job Â· HireDraft</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="src/app.js"></script>
+  </head>
+  <body>
+    <header class="header"><a class="brand" href="./" aria-label="HireDraft home"><span class="brand-icon" aria-hidden="true">H</span>HireDraft</a><span class="header-label">Your next opportunity starts here</span></header>
+    <main>
+      <div class="eyebrow">JOB APPLICATION WORKSPACE</div>
+      <h1>Start with the right opportunity.</h1>
+      <p class="intro">Bring a LinkedIn job listing or hiring post. Review the opportunity before your next step.</p>
+      <section class="card" aria-labelledby="page-title">
+        <div class="step">01 <span>BRING YOUR JOB LINK</span></div>
+        <h2 id="page-title">Analyze LinkedIn Job</h2>
+        <p class="description">Paste a LinkedIn job listing or recruiter post. Weâ€™ll detect the source and retrieve the available hiring information.</p>
+        <form id="job-form" novalidate>
+          <label for="job-url">LinkedIn job or hiring post URL</label>
+          <input id="job-url" name="jobUrl" type="text" inputmode="url" autocomplete="url" placeholder="Paste LinkedIn job or hiring post URL here" aria-describedby="url-hint validation-message" spellcheck="false">
+          <p id="url-hint" class="hint">Example: https://www.linkedin.com/jobs/view/1234567890</p>
+          <div class="actions"><button id="analyze-button" class="primary" type="submit" disabled>Analyze Job <span aria-hidden="true">â†’</span></button><button id="clear-button" class="secondary" type="button">Clear</button></div>
+          <div id="validation-message" class="message" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+        </form>
+        <div class="scope-note"><span aria-hidden="true">â“˜</span> We retrieve public job information only. If the page is unavailable, you can enter the details manually.</div>
+      </section>
+      <section id="extraction-section" class="card result-card" aria-labelledby="details-heading" hidden>
+        <div class="step">02 <span>REVIEW YOUR JOB DETAILS</span></div>
+        <h2 id="details-heading">Job Details</h2>
+        <p class="description">Review the extracted details before continuing.</p>
+        <div id="extraction-message" class="message" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+        <button id="retry-button" type="button" class="secondary" hidden>Try Again</button>
+        <div id="role-selection" class="role-selection" hidden>
+          <h3>Multiple Roles Found</h3>
+          <label for="role-select">Which role do you want to apply for?</label>
+          <select id="role-select"><option value="">Select a role</option></select>
+          <p class="hint">Select one role before editing or confirming. The original full post stays available below.</p>
+        </div>
+        <div id="job-details" hidden>
+          <dl class="job-summary"><div><dt>Job Title</dt><dd id="extracted-title"></dd></div><div><dt>Company</dt><dd id="extracted-company"></dd></div></dl>
+          <dl class="job-summary"><div><dt>Location</dt><dd id="extracted-location"></dd></div><div><dt>Experience</dt><dd id="extracted-experience"></dd></div></dl>
+          <dl id="post-information" class="job-summary" hidden>
+            <div><dt>Post Author</dt><dd id="post-author"></dd></div><div><dt>Author Headline</dt><dd id="author-headline"></dd></div>
+            <div><dt>Author Profile</dt><dd id="author-profile"></dd></div><div><dt>Published Date</dt><dd id="post-date"></dd></div>
+            <div><dt>Recruiter / HR Name</dt><dd id="extracted-recruiter"></dd></div><div><dt>Recruiter Email</dt><dd id="extracted-recruiter-email"></dd></div>
+            <div><dt>Application Email(s)</dt><dd id="application-emails"></dd></div><div><dt>Application Link(s)</dt><dd id="application-links"></dd></div>
+            <div><dt>Skills</dt><dd id="extracted-skills"></dd></div><div><dt>Employment Type</dt><dd id="employment-type"></dd></div>
+            <div><dt>Contact Number(s)</dt><dd id="contact-numbers"></dd></div>
+          </dl>
+          <h3 id="content-heading">Job Description</h3><div id="extracted-description" class="job-description"></div>
+          <p id="source-note" class="hint"></p>
+          <div class="actions"><button id="edit-button" type="button" class="secondary">Edit Details</button><button id="confirm-button" type="button" class="primary">Confirm Job Details</button></div>
+          <p id="review-message" class="hint" role="status" aria-live="polite"></p>
+        </div>
+        <form id="edit-form" class="manual-fallback" novalidate hidden>
+          <h3>Edit Details</h3>
+          <label for="edit-title">Job Title (required)</label><input id="edit-title" required>
+          <label for="edit-company">Company</label><input id="edit-company">
+          <label for="edit-location">Location</label><input id="edit-location">
+          <label for="edit-experience">Experience</label><input id="edit-experience">
+          <label for="edit-recruiter">Recruiter / HR Name</label><input id="edit-recruiter">
+          <label for="edit-email">Recruiter Email</label><input id="edit-email" type="email">
+          <label id="edit-content-label" for="edit-content">Job Description (required)</label><textarea id="edit-content" rows="10" required></textarea>
+          <p id="edit-message" class="hint" role="status" aria-live="polite"></p>
+          <div class="actions"><button type="submit" class="primary">Save Changes</button><button id="cancel-edit" type="button" class="secondary">Cancel</button></div>
+        </form>
+        <details id="original-post" class="manual-fallback" hidden><summary>Original full post</summary><div id="original-post-content" class="job-description"></div></details>
+        <section id="manual-fallback" class="manual-fallback" aria-labelledby="manual-heading" hidden>
+          <h3 id="manual-heading">Paste the job details manually instead.</h3>
+          <p class="description">Enter the original posting details. Your entries stay on this page for the next step.</p>
+          <form id="manual-form" novalidate>
+          <label for="manual-title">Job Title (required)</label><input id="manual-title" type="text" autocomplete="off" required>
+          <label for="manual-company">Company Name</label><input id="manual-company" type="text" autocomplete="organization">
+          <label for="manual-location">Location</label><input id="manual-location">
+          <label for="manual-recruiter">Recruiter / HR Name</label><input id="manual-recruiter">
+          <label for="manual-email">Recruiter Email</label><input id="manual-email" type="email">
+          <label id="manual-content-label" for="manual-description">Job Description (required)</label><textarea id="manual-description" rows="10" placeholder="Paste the complete job description or hiring post here" required></textarea>
+          <p id="manual-message" class="hint" role="status" aria-live="polite"></p>
+          <button type="submit" class="primary">Save Manual Details</button>
+          </form>
+        </section>
+      </section>
+      <section id="analysis-section" class="card result-card" aria-labelledby="analysis-heading" hidden>
+        <div class="step">03 <span>UNDERSTAND THE REQUIREMENTS</span></div>
+        <h2 id="analysis-heading">Job Analysis</h2>
+        <p class="description">Organize the confirmed job content into requirements. Review the evidence, correct anything that needs attention, and confirm the analysis.</p>
+        <button id="requirements-button" type="button" class="primary" disabled>Analyze Job Requirements</button>
+        <div id="analysis-message" class="message" role="status" aria-live="polite" aria-atomic="true"></div>
+        <button id="analysis-retry-button" type="button" class="secondary" hidden>Try Again</button>
+        <div id="analysis-results" hidden></div>
+        <div id="analysis-tools" class="actions" hidden><button id="analysis-edit-button" type="button" class="secondary">Edit Analysis</button><button id="analysis-confirm-button" type="button" class="primary">Confirm Job Analysis</button></div>
+        <form id="analysis-edit-form" class="manual-fallback" novalidate hidden>
+          <h3>Edit Analysis</h3>
+          <p class="description">Use one item per line in each list. Additions are recorded as your corrections and keep the original source intact.</p>
+          <label for="analysis-edit-experience">Experience</label><input id="analysis-edit-experience" placeholder="For example: 1â€“3 years">
+          <label for="analysis-edit-location">Location</label><input id="analysis-edit-location">
+          <label for="analysis-edit-requiredSkills">Required Skills</label><textarea id="analysis-edit-requiredSkills" rows="4"></textarea>
+          <label for="analysis-edit-preferredSkills">Preferred Skills</label><textarea id="analysis-edit-preferredSkills" rows="4"></textarea>
+          <label for="analysis-edit-mentionedSkills">Mentioned Skills â€” Priority Not Specified</label><textarea id="analysis-edit-mentionedSkills" rows="4"></textarea>
+          <label for="analysis-edit-responsibilities">Responsibilities</label><textarea id="analysis-edit-responsibilities" rows="5"></textarea>
+          <label for="analysis-edit-education">Education</label><textarea id="analysis-edit-education" rows="3"></textarea>
+          <label for="analysis-edit-workModes">Work Mode</label><input id="analysis-edit-workModes" placeholder="Remote, Hybrid, or On-site">
+          <label for="analysis-edit-domains">Domain Requirements</label><textarea id="analysis-edit-domains" rows="3"></textarea>
+          <label for="analysis-edit-joiningPreferences">Joining / Notice Period</label><textarea id="analysis-edit-joiningPreferences" rows="3"></textarea>
+          <label for="analysis-edit-applicationInstructions">Application Instructions</label><textarea id="analysis-edit-applicationInstructions" rows="5"></textarea>
+          <p id="analysis-edit-message" class="hint" data-state="error" role="status" aria-live="polite"></p>
+          <div class="actions"><button type="submit" class="primary">Save Analysis Changes</button><button id="analysis-edit-cancel" type="button" class="secondary">Cancel</button></div>
+        </form>
+        <details id="analysis-source" class="manual-fallback" hidden><summary>Confirmed source used for analysis</summary><div id="analysis-source-content" class="job-description"></div></details>
+        <details id="analysis-original" class="manual-fallback" hidden><summary>Original full post (context only)</summary><div id="analysis-original-content" class="job-description"></div></details>
+      </section>
+      <section id="candidate-section" class="card result-card" aria-labelledby="candidate-heading" hidden>
+        <div class="step">04 <span>TELL US ABOUT YOU</span></div>
+        <h2 id="candidate-heading">Tell Us About You</h2>
+        <p class="description">Upload your resume so HireDraft can understand your experience and create a more relevant application later.</p>
+        <button id="candidate-add-button" type="button" class="primary">Add Your Profile</button>
+        <div id="candidate-entry" hidden>
+          <form id="candidate-upload-form" class="manual-fallback" novalidate>
+            <h3>Resume / CV</h3><label for="candidate-upload">Upload or Replace Resume</label>
+            <input id="candidate-upload" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-describedby="candidate-upload-hint">
+            <p id="candidate-upload-hint" class="hint">PDF or DOCX — smaller than 5 MB. Text extraction only; scanned PDFs need manual entry. Files are processed in memory and are not saved.</p>
+            <button id="candidate-upload-button" type="submit" class="primary">Read Resume</button>
+          </form>
+          <details class="manual-fallback"><summary>Enter your information manually</summary>
+            <form id="candidate-manual-form" novalidate><label for="candidate-manual-text">Candidate information</label><textarea id="candidate-manual-text" rows="10" placeholder="Name, title, contacts, then headings such as Experience, Skills, Projects, Education, and Certifications."></textarea><button type="submit" class="secondary">Use Manual Information</button></form>
+          </details>
+          <section class="manual-fallback"><h3>Additional Context <span class="hint">Optional</span></h3><p class="hint">These entries are marked User Provided. Your resume remains the primary factual source.</p>
+<label for="candidate-context-noticePeriod">Notice Period</label><input id="candidate-context-noticePeriod" maxlength="2000">
+<label for="candidate-context-availability">Joining Availability</label><input id="candidate-context-availability" maxlength="2000">
+<label for="candidate-context-currentLocation">Current Location</label><input id="candidate-context-currentLocation" maxlength="2000">
+<label for="candidate-context-relocation">Willingness to Relocate</label><input id="candidate-context-relocation" maxlength="2000">
+<label for="candidate-context-currentCTC">Current CTC</label><input id="candidate-context-currentCTC" maxlength="2000">
+<label for="candidate-context-expectedCTC">Expected CTC</label><input id="candidate-context-expectedCTC" maxlength="2000">
+<label for="candidate-context-preferredLocation">Preferred Work Location</label><input id="candidate-context-preferredLocation" maxlength="2000">
+<label for="candidate-context-preferredRole">Preferred Role</label><input id="candidate-context-preferredRole" maxlength="2000">
+<label for="candidate-context-workMode">Work Mode Preferences — Optional</label><input id="candidate-context-workMode" maxlength="2000" placeholder="For example: Open to on-site, hybrid, or remote"><label for="candidate-context-shiftAvailability">Shift Availability</label><input id="candidate-context-shiftAvailability" maxlength="2000">          </section>
+          <details class="manual-fallback"><summary>Add Previous Application Email — Optional</summary><label for="candidate-previous-email">Previous Application Email</label><textarea id="candidate-previous-email" rows="8" maxlength="20000"></textarea><p class="hint">Stored as writing context. Claims in this email are not added to candidate facts.</p><label for="candidate-writing-preferences">Writing Preferences — Optional</label><textarea id="candidate-writing-preferences" rows="3" maxlength="5000"></textarea></details>
+          <h3>Candidate Profile</h3><div id="candidate-message" class="message" role="status" aria-live="polite" aria-atomic="true"></div>
+          <div id="candidate-results" hidden></div>
+          <div id="candidate-tools" class="actions" hidden><button id="candidate-edit-button" type="button" class="secondary">Edit Profile</button><button id="candidate-confirm-button" type="button" class="primary">Confirm Candidate Profile</button></div>
+          <form id="candidate-edit-form" class="manual-fallback" novalidate hidden><h3>Edit Profile</h3><p class="hint">Correct or remove extracted information. Changes are marked User Provided and preserve the original resume text. Use one item per line in lists. Employment dates support September 2024 or 2024-09; use Present for a current role.</p>
+<label for="candidate-edit-name">Name</label><input id="candidate-edit-name">
+<label for="candidate-edit-professionalTitle">Professional Title</label><input id="candidate-edit-professionalTitle">
+<label for="candidate-edit-location">Location</label><input id="candidate-edit-location">
+<label for="candidate-edit-email">Email</label><input id="candidate-edit-email">
+<label for="candidate-edit-phone">Phone</label><input id="candidate-edit-phone">
+<label for="candidate-edit-linkedIn">LinkedIn</label><input id="candidate-edit-linkedIn">
+<label for="candidate-edit-github">GitHub</label><input id="candidate-edit-github">
+<label for="candidate-edit-portfolio">Portfolio</label><input id="candidate-edit-portfolio">
+<label for="candidate-edit-professionalSummary">Professional Summary</label><textarea id="candidate-edit-professionalSummary" rows="4"></textarea>
+<label for="candidate-edit-skills">Technical Skills</label><textarea id="candidate-edit-skills" rows="4"></textarea>
+<label for="candidate-edit-achievements">Achievements</label><textarea id="candidate-edit-achievements" rows="4"></textarea>
+<h4>Employment Entries</h4><div id="candidate-edit-positions"></div>
+<h4>Projects</h4><div id="candidate-edit-projects"></div>
+<h4>Education</h4><div id="candidate-edit-education"></div>
+<h4>Certifications</h4><div id="candidate-edit-certifications"></div>          <p id="candidate-edit-message" class="hint" role="status" aria-live="polite"></p><div class="actions"><button type="submit" class="primary">Save Profile Changes</button><button id="candidate-edit-cancel" type="button" class="secondary">Cancel</button></div></form>
+          <details id="candidate-source" class="manual-fallback" hidden><summary>Original extracted resume text</summary><div id="candidate-source-text" class="job-description"></div></details>
+          <div class="actions"><button id="candidate-clear-button" type="button" class="secondary">Clear Candidate Data</button></div>
+          <p class="hint">Candidate information stays in this page's memory. Refreshing clears it. AI generation uses your confirmed information only when you request it.</p>
+        </div>
+      </section>
+      <section id="match-section" class="card result-card" aria-labelledby="match-heading" hidden>
+        <div class="step">05 <span>CHECK YOUR ALIGNMENT</span></div>
+        <h2 id="match-heading">Your Match</h2>
+        <p class="description">Compare confirmed job requirements with your candidate facts. Review direct matches, related experience, and information that is not yet verified.</p>
+        <button id="match-button" type="button" class="primary" disabled>Check My Match</button>
+        <div id="match-message" class="message" role="status" aria-live="polite" aria-atomic="true"></div>
+        <button id="match-retry-button" type="button" class="secondary" hidden>Recalculate Match</button>
+        <div id="match-results" hidden></div>
+        <section id="match-tools" class="manual-fallback" hidden>
+          <h3>What Your Application Should Highlight</h3>
+          <p class="hint">These are verified facts to emphasize later. Uncheck a highlight to remove it, or choose another fact from your confirmed Candidate Profile.</p>
+          <div id="match-highlight-options"></div>
+          <label for="match-add-select">Additional verified highlight</label><select id="match-add-select"><option value="">Choose a verified candidate fact</option></select>
+          <div class="actions"><button id="match-add-button" type="button" class="secondary">Add Highlight</button><button id="match-confirm-button" type="button" class="primary">Confirm Match &amp; Continue</button></div>
+          <p class="hint">Confirm your match to create an application email from these facts.</p>
+        </section>
+      </section>
+      <section id="email-section" class="card result-card" aria-labelledby="email-heading" hidden>
+<h2 id="email-heading">Generate Application Email</h2>
+<p class="description">Create a personalized application email using your verified profile and this job's requirements.</p>
+<label for="email-provider">Choose AI Model</label><select id="email-provider"><option value="">Select a model</option></select>
+<label for="email-tone">Tone</label><select id="email-tone"><option value="professional">Professional</option><option value="concise">Concise</option><option value="confident">Confident</option></select>
+<label for="email-length">Email Length</label><select id="email-length"><option value="standard">Standard</option><option value="short">Short</option></select>
+<label for="email-instruction">Anything you want to mention? (optional)</label><textarea id="email-instruction" rows="3" maxlength="1500" placeholder="Example: Mention that I'm an immediate joiner and emphasize my Playwright experience."></textarea>
+<p class="hint">Preferences influence wording; claims must be supported by confirmed facts. Relevant information is sent to your selected AI provider when you generate.</p>
+<div id="email-missing"></div><button id="email-generate" type="button" class="primary" disabled>Generate Email</button>
+<p id="email-status" class="message" role="status" aria-live="polite"></p>
+<section id="email-result" hidden><h3>Your Application Email</h3>
+<label for="email-subject">Subject</label><input id="email-subject" type="text" maxlength="250"><button id="email-copy-subject" type="button" class="secondary">Copy Subject</button>
+<label for="email-body">Email</label><textarea id="email-body" rows="14"></textarea>
+<div class="actions"><button id="email-copy-body" type="button" class="secondary">Copy Email</button><button id="email-copy-all" type="button" class="secondary">Copy All</button></div>
+<p id="email-copy-status" role="status" aria-live="polite"></p><p class="hint">Editing does not use another generation. Attach your resume yourself when sending. Drafts stay in this page's memory and are cleared on refresh.</p>
+</section></section>
+      <p class="footer-note">One link. A thoughtful first step.</p>
+    </main>
+    <footer>HireDraft <span>Built for your next chapter.</span></footer>
+  </body>
+</html>
+
+

@@ -1,0 +1,7 @@
+node_modules
+.next
+.npm-cache
+tests/legacy
+test-results
+package-lock.json
+docs/LEGACY_NOTES.md

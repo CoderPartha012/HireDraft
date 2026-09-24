@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createAppServer } from './legacy/server.js';
+import { extractJob } from '../src/server/extract-job.js';
+
+test('HTTP endpoint validates requests and returns extracted data end to end', async t => {
+  let sourceRequests = 0;
+  const server = createAppServer({ extract: (url, options) => extractJob(url, { ...options, fetchImpl: async target => {
+    sourceRequests++;
+    if (target.includes('/posts/')) return new Response('<article class="main-feed-card"><div class="attributed-text-segment-list__content">We are hiring QA Engineer<p>Company: Example</p><p>Location: Remote</p><p>Write and maintain tests for our web platform.</p></div></article>', { headers: { 'Content-Type': 'text/html' } });
+    return new Response('<h1 class="top-card-layout__title">QA Engineer</h1><a class="topcard__org-name-link">Example</a><div class="show-more-less-html__markup"><p>Build reliable automation and investigate software defects across the product.</p></div>', { headers: { 'Content-Type': 'text/html' } });
+  } }) });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => { server.close(resolve); server.closeAllConnections(); }));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  const send = (body, headers = { 'Content-Type': 'application/json' }) => fetch(`${base}/api/extract-job`, { method: 'POST', headers, body: typeof body === 'string' ? body : JSON.stringify(body) });
+  assert.equal((await fetch(`${base}/analyze-job`)).status, 200);
+  assert.equal((await fetch(`${base}/api/extract-job`)).status, 405);
+  assert.equal((await send({ url: 'https://google.com' })).status, 400);
+  assert.equal((await send({ url: 'https://linkedin.com/in/person' })).status, 400);
+  assert.equal((await send('broken JSON')).status, 400);
+  assert.equal((await send({ url: 'x' }, { 'Content-Type': 'text/plain' })).status, 415);
+  assert.equal((await send({ url: 'x', extra: true })).status, 400);
+  assert.equal((await send({ url: 'x' }, { 'Content-Type': 'application/json', Origin: 'https://evil.example' })).status, 403);
+  assert.equal((await send({ url: 'x'.repeat(9000) })).status, 413);
+  assert.equal(sourceRequests, 0);
+  const response = await send({ url: 'https://www.linkedin.com/jobs/view/1234567890' });
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('cache-control'), 'no-store');
+  const { job, profile } = await response.json();
+  assert.equal(job.extractionStatus, 'success');
+  assert.equal(job.jobTitle, 'QA Engineer');
+  assert.equal(sourceRequests, 1);
+  assert.equal(profile.sourceType, 'linkedin_job');
+  const postResponse = await send({ url: 'https://www.linkedin.com/posts/author_hiring-activity-7505130007300575232-Ab12?utm_source=share' });
+  const post = await postResponse.json();
+  assert.equal(postResponse.status, 200);
+  assert.equal(post.profile.sourceType, 'linkedin_post');
+  assert.equal(post.profile.jobTitle, 'QA Engineer');
+  assert.deepEqual(Object.keys(post.profile).sort(), Object.keys(profile).sort());
+  assert.equal(sourceRequests, 2);
+});
