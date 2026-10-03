@@ -12,7 +12,7 @@ const providers = {
     endpoint: "http://127.0.0.1:8000/v1/chat/completions",
   },
   bynara: {
-    label: "Bynara",
+    label: "Byanara AI",
     key: "BYNARA_API_KEY",
     model: "agnes-2.5-flash",
     endpoint: "https://router.bynara.id/v1/chat/completions",

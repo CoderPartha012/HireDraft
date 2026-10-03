@@ -1,5 +1,6 @@
+"use client";
 import Link from "next/link";
-import { ArrowUpRight, ChevronDown, MessageCircle } from "lucide-react";
+import { FAQ } from "@/components/ui/faq-tabs";
 
 const questions = [
   {
@@ -53,71 +54,40 @@ const questions = [
 ];
 
 export default function ApplicationFaq() {
+  const categories = {
+    start: "Getting started",
+    drafting: "Writing & sending",
+    data: "Your data & support",
+  };
+  const group = (indices: number[]) =>
+    indices.map((index) => ({
+      question: questions[index].question,
+      answer: (
+        <>
+          <p>{questions[index].answer}</p>
+          <p>{questions[index].detail}</p>
+        </>
+      ),
+    }));
   return (
-    <section
+    <FAQ
       id="questions"
-      className="section-shell application-faq"
-      aria-labelledby="faq-title"
+      categories={categories}
+      faqData={{
+        start: group([0, 1]),
+        drafting: group([2, 4]),
+        data: group([3, 5]),
+      }}
     >
-      <div className="faq-intro">
-        <p className="eyebrow">A FEW THINGS TO KNOW</p>
-        <h2 id="faq-title" className="section-title">
-          Before your
-          <br />
-          first introduction.
-        </h2>
-        <p className="mt-5 max-w-sm text-sm leading-7 text-muted">
-          What to bring, how your information is used, and what happens before
-          you hit send.
-        </p>
-        <div className="faq-help">
-          <MessageCircle
-            size={20}
-            strokeWidth={1.5}
-            className="text-lime"
-            aria-hidden="true"
-          />
-          <div>
-            <p className="text-sm font-medium text-white">
-              Still have a question?
-            </p>
-            <Link
-              href="/contact"
-              className="mt-2 inline-flex items-center gap-2 text-xs text-muted transition-colors hover:text-white"
-            >
-              Visit our contact page{" "}
-              <ArrowUpRight size={13} aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </div>
-      <div className="faq-list">
-        {questions.map((item, index) => (
-          <details
-            key={item.question}
-            className="faq-item"
-            name="application-questions"
-            open={index === 0}
-          >
-            <summary>
-              <span className="faq-number" aria-hidden="true">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="faq-category">{item.category}</span>
-                <span className="faq-question">{item.question}</span>
-              </span>
-              <span className="faq-toggle">
-                <ChevronDown size={17} aria-hidden="true" />
-              </span>
-            </summary>
-            <div className="faq-answer">
-              <p>{item.answer}</p>
-              <p>{item.detail}</p>
-            </div>
-          </details>
-        ))}
-      </div>
-    </section>
+      <p className="mt-8 text-center text-sm text-muted-foreground">
+        Still have a question?{" "}
+        <Link
+          href="/contact"
+          className="font-medium text-foreground underline underline-offset-4"
+        >
+          Get in touch
+        </Link>
+      </p>
+    </FAQ>
   );
 }

@@ -22,12 +22,14 @@ export default function ToastProvider({ children }) {
           role={toast.error ? "alert" : "status"}
           key={toast.id}
         >
-          <span className={toast.error ? "text-red-300" : "text-lime"}>
+          <span
+            className={toast.error ? "text-destructive" : "text-foreground"}
+          >
             {toast.error ? "Action needed" : "Done"}
           </span>
           <p className="text-sm leading-6">{toast.message}</p>
           <button
-            className="absolute right-3 top-2 p-2 text-muted"
+            className="absolute right-3 top-2 p-2 text-muted-foreground"
             aria-label="Dismiss notification"
             onClick={() => setToast(null)}
           >

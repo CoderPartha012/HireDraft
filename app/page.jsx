@@ -1,179 +1,173 @@
-import ApplicationFaq from "../components/application-faq";
-import ProductDemo from "../components/product-demo";
+import { HeroSection, LogosSection } from "@/components/ui/hero-1";
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUpRight,
   Check,
   FileText,
-  Fingerprint,
-  Link2,
-  Mail,
-  ScanLine,
-  ShieldCheck,
+  ListChecks,
   PenLine,
-} from "lucide-react";
-import CinematicHero from "../components/cinematic-hero";
-import WorkflowCards from "../components/workflow-cards";
-import ApplicationExamples from "../components/application-examples";
-import SupportedSources from "../components/supported-sources";
-import SiteFooter from "../components/site-footer";
+  Upload,
+} from "@/components/ui/material-icons";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import SiteHeader from "@/components/site-header";
+import SiteFooter from "@/components/site-footer";
+import ApplicationExamples from "@/components/application-examples";
+import ApplicationFaq from "@/components/application-faq";
+import SupportedSources from "@/components/supported-sources";
 
 const steps = [
   {
-    icon: Link2,
-    title: "Bring the opportunity.",
-    text: "Paste a LinkedIn job or hiring post. Review the details and uncover what the role really needs.",
+    icon: FileText,
+    title: "Add the opportunity",
+    text: "Paste a job link or description. Confirm the role and company.",
   },
   {
-    icon: Fingerprint,
-    title: "Add your perspective.",
-    text: "Upload your resume, review your experience, and see how your verified skills connect to the role.",
+    icon: ListChecks,
+    title: "Review the requirements",
+    text: "See what the role needs, with evidence from the original post.",
   },
   {
-    icon: Mail,
-    title: "Make the introduction.",
-    text: "Choose what to highlight. Create an application email that sounds like you, backed by your actual experience.",
+    icon: Upload,
+    title: "Bring your experience",
+    text: "Upload your resume and check the details that make you a fit.",
+  },
+  {
+    icon: PenLine,
+    title: "Make it your own",
+    text: "Generate a draft, refine the wording, and export when it feels right.",
   },
 ];
 
 export default function Home() {
   return (
-    <div className="landing-page">
+    <>
+      <SiteHeader />
       <main id="main-content">
-        <CinematicHero />
-        <ProductDemo />
-        <ApplicationExamples />
-        <section id="how-it-works" className="section-shell">
-          <div className="mb-14 flex flex-col justify-between gap-5 md:flex-row md:items-end">
-            <div>
-              <p className="eyebrow">LESS FRICTION. MORE INTENTION.</p>
-              <h2 className="section-title">
-                From opportunity
-                <br />
-                to introduction.
-              </h2>
+        <HeroSection>
+          <div className="relative rounded-2xl border bg-secondary/60 p-4 sm:p-6">
+            <div className="mb-5 flex items-center justify-between text-xs text-muted-foreground">
+              <span className="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="flex shrink-0 items-center gap-1.5"
+                >
+                  <span className="size-3 rounded-full bg-[#ff5f57] ring-1 ring-black/10" />
+                  <span className="size-3 rounded-full bg-[#febc2e] ring-1 ring-black/10" />
+                  <span className="size-3 rounded-full bg-[#28c840] ring-1 ring-black/10" />
+                </span>
+                Your next introduction
+              </span>
+              <span className="rounded border bg-card px-2 py-1 text-xs">
+                Example
+              </span>
             </div>
-            <p className="max-w-sm text-sm leading-6 text-muted">
-              One connected workspace, from the first job link to the final
-              words. You review every step.
+            <Card className="hero-preview gap-0 overflow-hidden border-border py-0">
+              <div className="flex items-center gap-3 border-b px-5 py-4">
+                <span className="flex size-8 items-center justify-center rounded-lg bg-secondary">
+                  <FileText className="size-4" />
+                </span>
+                <div>
+                  <p className="text-xs font-medium">Frontend Engineer</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Northstar Studio
+                  </p>
+                </div>
+                <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
+                  <Check className="size-3" /> Reviewed
+                </span>
+              </div>
+              <CardContent className="p-5 sm:p-6">
+                <p className="mb-4 border-b pb-4 text-xs">
+                  <span className="mr-3 text-muted-foreground">Subject</span>
+                  Application for Frontend Engineer
+                </p>
+                <div className="space-y-4 text-sm leading-relaxed text-muted-foreground">
+                  <p>Hello Northstar team,</p>
+                  <p>
+                    Your focus on accessible React interfaces stood out to me.
+                    In a recent booking project, I built keyboard-friendly flows
+                    and reusable form components.
+                  </p>
+                  <p>
+                    I'd love to share that work and learn more about what your
+                    team is building.
+                  </p>
+                  <p>
+                    Best,
+                    <br />
+                    Sam
+                  </p>
+                </div>
+              </CardContent>
+              <div className="flex items-center justify-between border-t bg-secondary/40 px-5 py-3 text-xs text-muted-foreground">
+                <span>Based on sample experience</span>
+                <span className="flex items-center gap-1.5">
+                  <PenLine className="size-3" /> Ready to personalize
+                </span>
+              </div>
+            </Card>
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+              Your resume + the role. One considered introduction.
             </p>
           </div>
-          <div className="grid gap-8 md:grid-cols-3">
+        </HeroSection>
+        <LogosSection />
+        <section id="how-it-works" className="section-shell">
+          <div className="max-w-xl">
+            <p className="eyebrow">How it works</p>
+            <h2 className="section-title">A clear path from role to reply.</h2>
+            <p className="mt-4 text-sm leading-7 text-muted-foreground">
+              Four simple steps. A chance to review at every stage.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map(({ icon: Icon, title, text }, i) => (
-              <article
-                key={title}
-                className="group border-t border-white/15 pt-6"
-              >
-                <div className="mb-9 flex items-center justify-between">
-                  <span className="flex size-11 items-center justify-center rounded-xl border border-white/10 bg-white/[.03] text-lime transition-transform group-hover:-translate-y-1">
-                    <Icon size={21} />
+              <div key={title} className="border-t pt-6">
+                <div className="mb-5 flex items-center justify-between">
+                  <span className="flex size-10 items-center justify-center rounded-lg border bg-secondary/40">
+                    <Icon className="size-4" />
                   </span>
-                  <span className="font-mono text-xs text-white/30">
+                  <span className="font-mono text-xs text-muted-foreground">
                     0{i + 1}
                   </span>
                 </div>
-                <h3 className="mb-3 text-lg font-medium">{title}</h3>
-                <p className="text-sm leading-7 text-muted">{text}</p>
-              </article>
+                <h3 className="text-base font-medium tracking-tight">
+                  {title}
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  {text}
+                </p>
+              </div>
             ))}
           </div>
         </section>
+        <div className="border-y bg-secondary/30">
+          <ApplicationExamples />
+        </div>
         <SupportedSources />
-        <section id="features" className="section-shell !pt-3">
-          <p className="eyebrow">BUILT AROUND YOUR REAL EXPERIENCE</p>
-          <h2 className="section-title mb-12">
-            More substance.
-            <br />
-            Less guesswork.
-          </h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            <article className="feature-card motion-card md:col-span-2">
-              <div className="mb-10 flex flex-wrap gap-2">
-                {[
-                  "Required skills",
-                  "Experience",
-                  "Responsibilities",
-                  "Your evidence",
-                ].map((x, i) => (
-                  <span
-                    key={x}
-                    className={`rounded-lg border px-3 py-2 text-xs ${i === 3 ? "border-lime/25 bg-lime/10 text-lime" : "border-white/10 text-muted"}`}
-                  >
-                    {x}
-                  </span>
-                ))}
-              </div>
-              <ScanLine className="mb-5 text-lime" size={24} />
-              <h3 className="mb-3 text-2xl tracking-tight">
-                See the role beyond the job title.
-              </h3>
-              <p className="max-w-lg text-sm leading-7 text-muted">
-                Break down requirements, separate must-haves from nice-to-haves,
-                and trace every finding back to the original posting.
+        <div className="border-t">
+          <ApplicationFaq />
+        </div>
+        <section className="page-width pb-20">
+          <div className="flex flex-col items-start justify-between gap-6 rounded-xl border bg-secondary/40 p-7 sm:p-10 md:flex-row md:items-center">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Let your experience do the talking.
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Start with a role. Leave with a draft that sounds like you.
               </p>
-            </article>
-            <article className="feature-card">
-              <div className="mb-8 flex h-20 items-center justify-center">
-                <div className="flex size-20 items-center justify-center rounded-full border border-lime/25 bg-lime/5">
-                  <ShieldCheck size={34} className="text-lime" />
-                </div>
-              </div>
-              <h3 className="mb-3 text-xl">Your facts come first.</h3>
-              <p className="text-sm leading-7 text-muted">
-                Review and correct extracted information. Drafts use confirmed
-                facts, with a separate check for unsupported claims.
-              </p>
-            </article>
-            <article className="feature-card">
-              <FileText size={25} className="mb-8 text-lime" />
-              <h3 className="mb-3 text-xl">A resume, with context.</h3>
-              <p className="text-sm leading-7 text-muted">
-                Bring a PDF or DOCX, or add details manually. Keep employment,
-                projects, and skills distinct.
-              </p>
-            </article>
-            <article className="feature-card md:col-span-2">
-              <div className="mb-8 flex gap-2">
-                <span className="rounded-full bg-lime px-4 py-1.5 text-xs text-ink">
-                  Professional
-                </span>
-                <span className="rounded-full border border-white/10 px-4 py-1.5 text-xs text-muted">
-                  Concise
-                </span>
-                <span className="rounded-full border border-white/10 px-4 py-1.5 text-xs text-muted">
-                  Confident
-                </span>
-              </div>
-              <h3 className="mb-3 text-2xl tracking-tight">
-                Still your voice. Still your call.
-              </h3>
-              <p className="max-w-lg text-sm leading-7 text-muted">
-                Choose your tone and highlights. Refine the subject and body.
-                Copy the finished draft when it feels right. Nothing sends
-                automatically.
-              </p>
-            </article>
-          </div>
-        </section>
-        <WorkflowCards />
-        <ApplicationFaq />
-        <section className="mx-auto max-w-7xl px-6 pb-20 lg:px-10">
-          <div className="liquid-glass final-cta relative overflow-hidden rounded-3xl px-6 py-20 text-center">
-            <p className="eyebrow">YOUR NEXT CHAPTER</p>
-            <h2 className="text-4xl font-medium tracking-[-.05em] sm:text-5xl">
-              Start with a better hello.
-            </h2>
-            <p className="mb-8 mt-5 text-sm text-muted">
-              You have the experience. Let’s help you put it into words.
-            </p>
-            <Link href="/analyze-job" className="button-primary">
-              Open your workspace <ArrowUpRight size={17} />
-            </Link>
+            </div>
+            <Button asChild size="lg">
+              <Link href="/analyze-job">
+                Create your first draft <ArrowRight className="size-4" />
+              </Link>
+            </Button>
           </div>
         </section>
       </main>
       <SiteFooter />
-    </div>
+    </>
   );
 }

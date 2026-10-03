@@ -45,8 +45,9 @@ const jobText =
   "Required Skills: Selenium, Java\nPreferred Skills: Playwright\nResponsibilities: Design and execute test cases.\nLocation: Remote";
 const candidateText =
   "Jane Doe\nQA Engineer\njane@example.com\n\nSkills\nSelenium, Java, Playwright\n\nExperience\nQA Engineer | Example Company\nJanuary 2023 - January 2025\nFull-time\n- Design and execute test cases using Selenium and Java.\n\nEducation\nBachelor of Computer Science";
-async function manualToEmail(page) {
+async function manualToEmail(page, inspect = async () => {}) {
   await page.goto("/analyze-job");
+  await inspect("opportunity");
   await page.getByRole("button", { name: "Enter details manually" }).click();
   await page
     .getByLabel("Job Title (required)", { exact: true })
@@ -61,11 +62,13 @@ async function manualToEmail(page) {
     .getByRole("button", { name: "Confirm job details", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Read between the requirements." }),
+    page.getByRole("heading", { name: "Review the job requirements." }),
   ).toBeVisible();
+  await inspect("requirements");
   await page
     .getByRole("button", { name: "Confirm requirements", exact: true })
     .click();
+  await inspect("experience");
   await page
     .getByText("Enter your information manually", { exact: true })
     .click();
@@ -78,9 +81,10 @@ async function manualToEmail(page) {
   await page
     .getByRole("button", { name: "Confirm my profile", exact: true })
     .click();
+  await inspect("writing");
   await expect(
     page.getByRole("heading", {
-      name: "Make your first words count.",
+      name: "Draft your application email.",
       exact: true,
     }),
   ).toBeVisible();
@@ -91,6 +95,75 @@ async function manualToEmail(page) {
     page.getByRole("button", { name: "Confirm match & continue" }),
   ).toHaveCount(0);
 }
+
+test("all workspace steps and Markdown editing fit phone, tablet and desktop widths", async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.route("**/api/ai-providers", (route) =>
+    route.fulfill({
+      json: {
+        providers: [
+          {
+            id: "bynara",
+            label: "Byanara AI (agnes-2.5-flash)",
+            available: true,
+          },
+        ],
+      },
+    }),
+  );
+  await page.route("**/api/generate-email", (route) =>
+    route.fulfill({
+      json: {
+        subject: "QA Application",
+        body: "Hello, my Selenium and Java experience is relevant to this role. Best, Jane.",
+        metadata: { status: "verified", provider: "bynara" },
+      },
+    }),
+  );
+  const inspect = async (stage) => {
+    for (const width of [320, 390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+        `${stage} at ${width}px`,
+      ).toBeLessThanOrEqual(width);
+      if ([320, 768, 1440].includes(width))
+        await page.screenshot({
+          path: `test-results/review-workspace-${stage}-${width}.png`,
+          fullPage: true,
+          animations: "disabled",
+        });
+    }
+  };
+  await manualToEmail(page, inspect);
+  await expect(page.getByLabel("AI provider", { exact: true })).toHaveValue(
+    "bynara",
+  );
+  await page
+    .getByRole("button", { name: "Generate application email", exact: true })
+    .click();
+  await expect(page.getByLabel("Subject", { exact: true })).toHaveValue(
+    "QA Application",
+  );
+  await inspect("draft");
+  await page
+    .getByRole("button", { name: "Use Markdown editor", exact: true })
+    .click();
+  await page
+    .getByLabel("Email body", { exact: true })
+    .fill(
+      "## Experience\n\n**Selenium** and Java\n\n| Skill | Evidence |\n| --- | --- |\n| Selenium | Automated testing |\n\nhttps://example.com/" +
+        "long-path-".repeat(30),
+    );
+  await inspect("markdown");
+  await page
+    .getByRole("button", { name: "Save to History", exact: true })
+    .click();
+  await inspect("saved");
+});
 
 test("Markdown editing, preview, exports, history and popup notifications stay consistent", async ({
   page,
@@ -331,9 +404,9 @@ test("landing and mobile workspace render without overflow or client errors", as
     path: "test-results/landing-desktop.png",
     fullPage: true,
   });
-  await page.getByRole("link", { name: "Draft my application email" }).click();
+  await page.getByRole("link", { name: "Create an application" }).click();
   await expect(
-    page.getByRole("heading", { name: "Start with the right opportunity." }),
+    page.getByRole("heading", { name: "Add a job opportunity." }),
   ).toBeVisible();
   await page.screenshot({
     path: "test-results/workspace-desktop.png",
@@ -490,7 +563,7 @@ test("React analysis corrections and structured profile edits preserve the confi
     .click();
   await expect(
     page.getByRole("heading", {
-      name: "Make your first words count.",
+      name: "Draft your application email.",
       exact: true,
     }),
   ).toBeVisible();
@@ -523,11 +596,82 @@ test("production Next.js resume route runs its worker and the React upload can b
     .getByRole("button", { name: "Your experience", exact: true })
     .click();
   await page.getByLabel("Resume file").setInputFiles({
+    name: "photo.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("invalid"),
+  });
+  await expect(page.locator("p[role=alert]")).toContainText(
+    "Choose a PDF or DOCX resume.",
+  );
+  await expect(
+    page.getByRole("button", { name: "Read resume", exact: true }),
+  ).toBeDisabled();
+  await page.getByLabel("Resume file").setInputFiles({
+    name: "large.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.alloc(5 * 1024 * 1024),
+  });
+  await expect(page.locator("p[role=alert]")).toContainText(
+    "smaller than 5 MB",
+  );
+  const dropped = await page.evaluateHandle(() => {
+    const dt = new DataTransfer();
+    dt.items.add(
+      new File(["resume content"], "dropped.docx", {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      }),
+    );
+    return dt;
+  });
+  await page
+    .getByTestId("resume-dropzone")
+    .dispatchEvent("drop", { dataTransfer: dropped });
+  await expect(page.getByText("dropped.docx", { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: "Remove dropped.docx", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Read resume", exact: true }),
+  ).toBeDisabled();
+  await page.getByLabel("Resume file").setInputFiles({
     name: "resume.pdf",
     mimeType: "application/pdf",
     buffer: resumePdf(),
   });
+  const lightToggle = page.getByRole("button", {
+    name: "Switch to light theme",
+    exact: true,
+  });
+  if (await lightToggle.count()) await lightToggle.click();
+  await page.setViewportSize({ width: 390, height: 1000 });
+  await page
+    .getByRole("button", { name: "Browse file", exact: true })
+    .scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: "test-results/upload-card-mobile.png",
+    fullPage: true,
+  });
+  await page
+    .getByRole("button", { name: "Switch to dark theme", exact: true })
+    .click();
+  await page.screenshot({
+    path: "test-results/upload-card-dark-mobile.png",
+    fullPage: true,
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.route("**/api/read-resume", async (route) => {
+    const response = await route.fetch();
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    await route.fulfill({ response });
+  });
   await page.getByRole("button", { name: "Read resume", exact: true }).click();
+  await expect(
+    page.getByRole("progressbar", { name: "Reading resume" }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Your profile, in your words" }),
   ).toBeVisible();
@@ -607,7 +751,7 @@ test("multiple-role extraction requires a selection and cancellation ignores sta
     .getByRole("button", { name: "Confirm job details", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Read between the requirements." }),
+    page.getByRole("heading", { name: "Review the job requirements." }),
   ).toBeVisible();
 });
 
@@ -651,7 +795,7 @@ test("loading animation is accessible, cancellable and respects reduced motion",
   await page.emulateMedia({ reducedMotion: "reduce" });
   expect(
     await page
-      .locator(".document-scan")
+      .locator(".processing-state svg")
       .evaluate((el) => getComputedStyle(el).animationName),
   ).toBe("none");
   // Loading remains in document flow rather than floating over the form on scroll.

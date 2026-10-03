@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, FileText, Mail, Check } from "lucide-react";
-import TypingText from "./typing-text";
-import ExampleTextReveal from "./example-text-reveal";
+import {
+  ArrowUpRight,
+  FileText,
+  Mail,
+  Check,
+} from "@/components/ui/material-icons";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 const examples = [
   {
@@ -45,103 +50,76 @@ export default function ApplicationExamples() {
   const example = examples[selected];
   return (
     <section id="examples" className="section-shell">
-      <div className="mb-9 flex flex-wrap items-end justify-between gap-5">
+      <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="eyebrow">EXAMPLE APPLICATIONS</p>
-          <h2 className="section-title">
-            See the facts.
-            <br />
-            Read the introduction.
-          </h2>
+          <p className="eyebrow">A little inspiration</p>
+          <h2 className="section-title">Specific experience. Better emails.</h2>
         </div>
-        <p className="max-w-sm text-sm leading-7 text-muted">
-          Explore three fictional examples. Each email connects the role to the
-          experience shown beside it. These are illustrations, not live
-          generations.
+        <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+          Fictional examples that show how a role and your experience come
+          together.
         </p>
       </div>
       <div
-        className="mb-5 flex flex-wrap gap-2"
+        className="mb-6 flex flex-wrap gap-2"
         role="group"
         aria-label="Choose an example role"
       >
         {examples.map((item, index) => (
-          <button
+          <Button
             key={item.role}
+            variant={selected === index ? "default" : "outline"}
             aria-pressed={selected === index}
             onClick={() => setSelected(index)}
-            className={
-              selected === index ? "button-primary" : "button-secondary"
-            }
           >
             {item.role}
-          </button>
+          </Button>
         ))}
       </div>
-      <div className="inbox-preview overflow-hidden rounded-2xl border border-white/15 bg-panel shadow-2xl shadow-black/20">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-4 text-[10px] tracking-widest text-muted">
-          <span className="flex items-center gap-3">
-            <span className="traffic-lights" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-            HireDraft ? Application preview
-          </span>
-          <span className="text-lime">ILLUSTRATIVE EXAMPLE</span>
-        </div>
-        <div
-          className="example-transition grid md:grid-cols-[.8fr_1.2fr]"
-          key={example.role}
-        >
-          <div className="space-y-7 border-b border-white/10 bg-black/10 p-6 md:border-b-0 md:border-r sm:p-8">
+      <Card className="gap-0 overflow-hidden py-0 shadow-xs">
+        <div className="grid md:grid-cols-[.75fr_1.25fr]">
+          <div className="space-y-8 border-b bg-secondary/40 p-6 sm:p-8 md:border-b-0 md:border-r">
             <div>
-              <p className="eyebrow">01 / THE OPPORTUNITY</p>
-              <h3 className="text-xl">{example.role}</h3>
-              <p className="mt-1 text-xs text-muted">
-                {example.company} · Fictional company
+              <p className="eyebrow">The opportunity</p>
+              <h3 className="text-lg font-semibold">{example.role}</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {example.company} / Fictional company
               </p>
-              <p className="mt-4 text-sm leading-7 text-muted">
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                 {example.needs}
               </p>
             </div>
-            <div className="rounded-xl border border-lime/15 bg-lime/[.03] p-5">
-              <p className="mb-3 flex items-center gap-2 text-xs text-lime">
-                <FileText size={15} />
-                02 / RESUME EVIDENCE
+            <div className="border-t pt-6">
+              <p className="mb-3 flex items-center gap-2 text-xs font-medium">
+                <FileText size={15} /> Resume experience
               </p>
-              <p className="text-sm leading-7 text-muted">{example.evidence}</p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {example.evidence}
+              </p>
             </div>
-            <p className="flex items-start gap-2 text-xs leading-6 text-muted">
-              <Check size={16} className="mt-1 shrink-0 text-lime" />
-              Specific experience. No invented years, metrics, or
-              qualifications.
-            </p>
           </div>
           <article
             className="p-6 sm:p-8"
             aria-label={`${example.role} example email`}
           >
-            <p className="mb-5 flex items-center gap-2 text-xs text-lime">
-              <Mail size={16} />
-              03 / THE APPLICATION EMAIL
+            <p className="mb-5 flex items-center gap-2 text-xs font-medium">
+              <Mail size={15} /> The application email
             </p>
-            <p className="text-[10px] uppercase tracking-widest text-muted">
-              Subject
+            <div className="mb-5 border-b pb-5">
+              <p className="mb-2 text-xs text-muted-foreground">Subject</p>
+              <h3 className="text-sm font-medium">{example.subject}</h3>
+            </div>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+              {example.body}
             </p>
-            <h3 className="mb-5 mt-2 border-b border-white/10 pb-5 text-base font-medium leading-7">
-              <TypingText text={example.subject} />
-            </h3>
-            <ExampleTextReveal key={example.role} text={example.body} />
           </article>
         </div>
-      </div>
-      <Link
-        href="/analyze-job"
-        className="mt-6 inline-flex items-center gap-2 text-sm text-lime"
-      >
-        Now write your own introduction <ArrowUpRight size={15} />
-      </Link>
+      </Card>
+      <Button asChild variant="link" className="mt-5 px-0">
+        <Link href="/analyze-job">
+          Write your own introduction <ArrowUpRight size={15} />
+        </Link>
+      </Button>
     </section>
   );
 }

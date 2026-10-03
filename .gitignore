@@ -77,3 +77,6 @@ logs/
 Thumbs.db
 Desktop.ini
 ollama-install-reviewed.ps1
+
+# Local video composition and rendering tools
+brag-output*/

@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "./toast-provider";
 import {
@@ -32,9 +33,10 @@ export default function EmailExports({ email, onSave }) {
     }
   }
   return (
-    <div className="space-y-3 border-t border-white/10 pt-5">
+    <div className="space-y-3 border-t border-border pt-5">
       <div className="flex flex-wrap gap-2" aria-label="Export and sharing">
-        <button
+        <Button
+          variant="outline"
           className="button-secondary !text-xs"
           disabled={working}
           onClick={() =>
@@ -42,8 +44,9 @@ export default function EmailExports({ email, onSave }) {
           }
         >
           Download as .txt
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           className="button-secondary !text-xs"
           disabled={working}
           onClick={() =>
@@ -51,8 +54,9 @@ export default function EmailExports({ email, onSave }) {
           }
         >
           {working ? "Preparing…" : "Download as .docx"}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           className="button-secondary !text-xs"
           disabled={working}
           onClick={() =>
@@ -63,8 +67,9 @@ export default function EmailExports({ email, onSave }) {
           }
         >
           Copy as Markdown
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           className="button-secondary !text-xs"
           disabled={working}
           onClick={() =>
@@ -75,7 +80,7 @@ export default function EmailExports({ email, onSave }) {
           }
         >
           Download as .md
-        </button>
+        </Button>
         <a
           className="button-secondary !text-xs"
           href={gmailComposeUrl(email)}
@@ -86,17 +91,21 @@ export default function EmailExports({ email, onSave }) {
           Open in Gmail
         </a>
         {onSave && (
-          <button className="button-secondary !text-xs" onClick={onSave}>
+          <Button
+            variant="outline"
+            className="button-secondary !text-xs"
+            onClick={onSave}
+          >
             Save to History
-          </button>
+          </Button>
         )}
       </div>
-      <p className="text-xs leading-6 text-muted">
+      <p className="text-xs leading-6 text-muted-foreground">
         Gmail opens a compose window with this subject and body. Add the
         recipient and resume, review, then send yourself.
       </p>
       {message && (
-        <p role="status" className="text-xs text-lime">
+        <p role="status" className="text-xs text-foreground">
           {message}
         </p>
       )}

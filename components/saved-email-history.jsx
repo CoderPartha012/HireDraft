@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { HISTORY_KEY, readHistory } from "../src/email-history";
 import EmailExports from "./email-exports";
@@ -39,18 +40,18 @@ export default function SavedEmailHistory({ revision }) {
       <summary className="cursor-pointer text-sm font-medium">
         Saved History ({items.length})
       </summary>
-      <p className="my-4 text-xs leading-6 text-muted">
+      <p className="my-4 text-xs leading-6 text-muted-foreground">
         Only drafts you explicitly save are retained on this browser, up to 30
         emails. They may contain personal information. Delete them here when you
         no longer need them. Saved emails do not restore job or resume profiles.
       </p>
       {error && (
-        <p role="alert" className="text-sm text-muted">
+        <p role="alert" className="text-sm text-muted-foreground">
           {error}
         </p>
       )}
       {!items.length && (
-        <p className="text-xs text-muted">
+        <p className="text-xs text-muted-foreground">
           No saved drafts yet. Generate an email and choose Save to History.
         </p>
       )}
@@ -58,12 +59,12 @@ export default function SavedEmailHistory({ revision }) {
         {items.map((item) => (
           <details
             key={item.id}
-            className="rounded-lg border border-white/10 p-4"
+            className="rounded-lg border border-border p-4"
           >
             <summary className="cursor-pointer break-words text-sm">
               Generation {item.metadata?.generation || 1} — {item.subject}
             </summary>
-            <p className="my-3 text-xs text-muted">
+            <p className="my-3 text-xs text-muted-foreground">
               Saved {new Date(item.savedAt).toLocaleString()} ·{" "}
               {item.edited
                 ? "Manually edited; changes not checked"
@@ -77,12 +78,13 @@ export default function SavedEmailHistory({ revision }) {
               </p>
             )}
             <EmailExports email={item} />
-            <button
-              className="mt-4 text-xs text-muted underline"
+            <Button
+              variant="ghost"
+              className="mt-4 text-xs text-muted-foreground underline"
               onClick={() => remove(item.id)}
             >
               Delete saved email
-            </button>
+            </Button>
           </details>
         ))}
       </div>

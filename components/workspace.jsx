@@ -1,4 +1,7 @@
 "use client";
+import { FileUploadCard } from "@/components/ui/file-upload-card";
+import ThemeToggle from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -20,8 +23,9 @@ import {
   ShieldCheck,
   PenLine,
   Upload,
-} from "lucide-react";
+} from "@/components/ui/material-icons";
 import Brand from "./brand";
+import { Card } from "@/components/ui/card";
 import ProcessingState from "./processing-state";
 import EmailExports from "./email-exports";
 import MarkdownEditor from "./markdown-editor";
@@ -60,7 +64,7 @@ const stages = [
     name: "The opportunity",
     short: "Job",
     icon: Link2,
-    title: "Start with the right opportunity.",
+    title: "Add a job opportunity.",
     subtitle:
       "Bring a LinkedIn job or hiring post. Let’s understand what comes next.",
   },
@@ -68,7 +72,7 @@ const stages = [
     name: "The requirements",
     short: "Requirements",
     icon: FileText,
-    title: "Read between the requirements.",
+    title: "Review the job requirements.",
     subtitle:
       "Review what matters to this role, with evidence from the original posting.",
   },
@@ -76,7 +80,7 @@ const stages = [
     name: "Your experience",
     short: "Profile",
     icon: Fingerprint,
-    title: "The story only you can tell.",
+    title: "Review your experience.",
     subtitle:
       "Bring your resume, add context, and make sure every detail feels right.",
   },
@@ -84,7 +88,7 @@ const stages = [
     name: "Your introduction",
     short: "Email",
     icon: Mail,
-    title: "Make your first words count.",
+    title: "Draft your application email.",
     subtitle: "A thoughtful application, built on the facts you’ve reviewed.",
   },
 ];
@@ -110,27 +114,30 @@ const blank = () => ({
 
 function Panel({ title, description, children, icon: Icon }) {
   return (
-    <section className="workspace-card">
+    <Card className="workspace-card block">
       <div className="mb-6 flex items-start gap-3">
         {Icon && (
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-lime/15 bg-lime/5 text-lime">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary text-foreground">
             <Icon size={17} />
           </span>
         )}
         <div>
           <h2 className="text-lg font-medium tracking-tight">{title}</h2>
           {description && (
-            <p className="mt-1.5 text-sm leading-6 text-muted">{description}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              {description}
+            </p>
           )}
         </div>
       </div>
       {children}
-    </section>
+    </Card>
   );
 }
 function Continue({ children = "Confirm & continue", onClick, disabled }) {
   return (
-    <button
+    <Button
+      variant="default"
       type="button"
       className="button-primary"
       disabled={disabled}
@@ -138,12 +145,12 @@ function Continue({ children = "Confirm & continue", onClick, disabled }) {
     >
       {children}
       <ArrowRight size={15} />
-    </button>
+    </Button>
   );
 }
 function Disclosure({ title, children, open = false }) {
   return (
-    <details open={open} className="rounded-lg border border-white/10 p-4">
+    <details open={open} className="rounded-lg border border-border p-4">
       <summary className="text-sm font-medium">{title}</summary>
       <div className="mt-5">{children}</div>
     </details>
@@ -172,7 +179,7 @@ export default function Workspace() {
   const [providers, setProviders] = useState([]),
     [providerState, setProviderState] = useState("loading");
   const [preferences, setPreferences] = useState({
-      provider: "",
+      provider: "bynara",
       tone: "professional",
       length: "standard",
       instruction: "",
@@ -197,10 +204,7 @@ export default function Workspace() {
   const generationInFlight = useRef(false);
   const request = useRef({ version: 0, controller: null });
   const heading = useRef(null);
-  const fileInput = useRef(null);
-  useEffect(() => {
-    if (!file && fileInput.current) fileInput.current.value = "";
-  }, [file]);
+
   useEffect(
     () => () => {
       request.current.version++;
@@ -684,69 +688,72 @@ export default function Workspace() {
 
   return (
     <div className="application-workspace min-h-screen lg:grid lg:grid-cols-[250px_1fr]">
-      <aside className="border-b border-white/10 bg-[#0e1014]/90 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:border-b-0 lg:border-r">
+      <aside className="border-b border-border bg-card lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:border-b-0 lg:border-r">
         <div className="flex items-center justify-between px-6 py-7">
           <Brand />
           <Link
             href="/"
             aria-label="Back to home"
-            className="text-muted lg:hidden"
+            className="text-muted-foreground lg:hidden"
           >
             <ArrowUpRight size={18} />
           </Link>
         </div>
         <div className="px-5 pb-5">
-          <button
+          <Button
+            variant="outline"
             onClick={newApplication}
             className="button-secondary w-full !justify-start !py-3 !text-xs"
           >
             <Plus size={15} />
             New application
-          </button>
+          </Button>
         </div>
-        <p className="hidden px-7 pb-4 pt-4 text-[9px] font-semibold tracking-[.18em] text-muted lg:block">
+        <p className="hidden px-7 pb-4 pt-4 text-xs font-medium tracking-wide text-muted-foreground lg:block">
           YOUR WORKSPACE
         </p>
         <nav
           aria-label="Application steps"
-          className="flex gap-1 overflow-x-auto px-4 pb-4 lg:block lg:space-y-2"
+          className="grid grid-cols-4 gap-1 px-4 pb-4 lg:block lg:space-y-2"
         >
           {stages.map(({ name, short, icon: Icon }, i) => (
-            <button
+            <Button
+              variant="ghost"
               key={name}
               disabled={!unlocked[i] || !!busy}
               aria-label={name}
               aria-current={stage === i ? "step" : undefined}
               onClick={() => go(i)}
-              className={`flex shrink-0 items-center gap-3 rounded-lg px-3 py-3 text-xs transition-colors lg:w-full ${stage === i ? "bg-lime/10 text-lime" : "text-muted hover:bg-white/5 hover:text-white"}`}
+              className={`flex h-auto min-w-0 flex-col items-center gap-2 rounded-lg px-1 py-3 text-xs transition-colors lg:w-full lg:flex-row lg:gap-3 lg:px-3 lg:text-xs ${stage === i ? "bg-secondary text-foreground font-medium" : "text-muted-foreground hover:bg-secondary hover:text-foreground"}`}
             >
               <Icon size={17} />
               <span className="lg:hidden">{short}</span>
               <span className="hidden lg:block">{name}</span>
               {complete[i] ? (
-                <Check size={13} className="ml-auto text-lime" />
+                <Check
+                  size={13}
+                  className="ml-auto hidden text-foreground lg:block"
+                />
               ) : (
-                <span className="ml-auto hidden font-mono text-[10px] opacity-50 lg:inline">
+                <span className="ml-auto hidden font-mono text-xs opacity-50 lg:inline">
                   0{i + 1}
                 </span>
               )}
-            </button>
+            </Button>
           ))}
         </nav>
         <div className="mt-auto hidden space-y-5 p-5 lg:block">
-          <div className="rounded-xl border border-white/10 p-4">
-            <ShieldCheck size={19} className="mb-3 text-lime" />
-            <p className="mb-2 text-xs font-medium">
-              A little more intentional.
-            </p>
-            <p className="text-[11px] leading-5 text-muted">
+          <div className="rounded-xl border border-border p-4">
+            <ShieldCheck size={19} className="mb-3 text-foreground" />
+            <p className="mb-2 text-xs font-medium">Keep your progress.</p>
+            <p className="text-xs leading-5 text-muted-foreground">
               Unsaved information stays in this session. Refreshing clears your
               workspace.
             </p>
           </div>
           <Link
             href="/#questions"
-            className="flex items-center gap-2 px-2 text-xs text-muted"
+            className="flex items-center gap-2 px-2 text-xs text-muted-foreground"
           >
             <CircleHelp size={15} />
             Questions & answers
@@ -755,16 +762,13 @@ export default function Workspace() {
         </div>
       </aside>
       <div className="min-w-0">
-        <header className="flex h-20 items-center justify-between border-b border-white/10 px-6 sm:px-10">
-          <div className="flex items-center gap-2 text-xs text-muted">
+        <header className="flex h-20 items-center justify-between border-b border-border px-6 sm:px-10">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>Workspace</span>
             <ChevronRight size={12} />
-            <span className="text-white/80">{current.name}</span>
+            <span className="text-foreground">{current.name}</span>
           </div>
-          <span className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-[10px] text-muted">
-            <span className="size-1.5 rounded-full bg-lime" />
-            Local workspace
-          </span>
+          <ThemeToggle />
         </header>
         <main
           id="main-content"
@@ -775,31 +779,31 @@ export default function Workspace() {
             <h1
               ref={heading}
               tabIndex={-1}
-              className="text-3xl font-medium tracking-[-.045em] outline-none sm:text-4xl"
+              className="text-3xl font-semibold tracking-tight outline-none sm:text-4xl"
             >
               {current.title}
             </h1>
-            <p className="mt-3 text-sm leading-6 text-muted">
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               {current.subtitle}
             </p>
           </div>
           <div
             className="mb-8 flex gap-2"
-            aria-label={`${complete.filter(Boolean).length} of 5 steps complete`}
+            aria-label={`${complete.filter(Boolean).length} of 4 steps complete`}
           >
             {stages.map((x, i) => (
               <div
                 key={x.name}
-                className={`h-1 flex-1 rounded-full ${complete[i] ? "bg-lime" : stage === i ? "bg-lime/35" : "bg-white/10"}`}
+                className={`h-1 flex-1 rounded-full ${complete[i] ? "bg-primary" : stage === i ? "bg-primary/50" : "bg-secondary"}`}
               />
             ))}
           </div>
-          <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_240px]">
+          <div className="grid items-start gap-6 2xl:grid-cols-[minmax(0,1fr)_220px]">
             <div className="min-w-0 space-y-5">
               {notice && (
                 <div
                   role={notice.type === "error" ? "alert" : "status"}
-                  className={`rounded-lg border px-4 py-3 text-sm leading-6 ${notice.type === "error" ? "border-red-400/25 bg-red-400/5 text-red-200" : notice.type === "success" ? "border-lime/25 bg-lime/5 text-lime" : "border-white/15 bg-white/5 text-white/80"}`}
+                  className={`rounded-lg border px-4 py-3 text-sm leading-relaxed ${notice.type === "error" ? "border-destructive/25 bg-destructive/5 text-destructive" : notice.type === "success" ? "border-border bg-secondary text-foreground" : "border-border bg-secondary text-foreground"}`}
                 >
                   {notice.text}
                 </div>
@@ -809,8 +813,8 @@ export default function Workspace() {
                 <>
                   <Panel
                     icon={Link2}
-                    title="Bring your job link"
-                    description="Every good application starts with understanding the opportunity."
+                    title="Add a LinkedIn job link"
+                    description="Paste a public listing or hiring post, or enter the details below."
                   >
                     <form onSubmit={extract} className="space-y-5">
                       <Field
@@ -828,7 +832,8 @@ export default function Workspace() {
                         autoComplete="url"
                       />
                       <div className="flex flex-wrap gap-3">
-                        <button
+                        <Button
+                          variant="default"
                           className="button-primary"
                           disabled={!!busy || !url.trim()}
                           type="submit"
@@ -836,8 +841,9 @@ export default function Workspace() {
                           <PenLine size={15} />
                           Analyze opportunity
                           <ArrowRight size={15} />
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="outline"
                           className="button-secondary"
                           type="button"
                           onClick={() => {
@@ -849,18 +855,19 @@ export default function Workspace() {
                           }}
                         >
                           Clear
-                        </button>
+                        </Button>
                       </div>
                     </form>
-                    <div className="my-6 border-t border-white/10" />
-                    <p className="text-xs leading-6 text-muted">
+                    <div className="my-6 border-t border-border" />
+                    <p className="text-xs leading-6 text-muted-foreground">
                       Don’t have a public link, or the page won’t load?{" "}
-                      <button
+                      <Button
+                        variant="ghost"
                         onClick={useManual}
-                        className="text-lime underline decoration-lime/30 underline-offset-4"
+                        className="text-foreground underline decoration-border underline-offset-4"
                       >
                         Enter details manually
-                      </button>
+                      </Button>
                     </p>
                   </Panel>
                   {draftJob && (
@@ -959,7 +966,7 @@ export default function Workspace() {
                               )}
                             />
                             {draftJob.originalPostContent && (
-                              <p className="mt-4 whitespace-pre-wrap text-xs leading-6 text-muted">
+                              <p className="mt-4 whitespace-pre-wrap text-xs leading-6 text-muted-foreground">
                                 {draftJob.originalPostContent}
                               </p>
                             )}
@@ -1012,14 +1019,17 @@ export default function Workspace() {
                         />
                       ))}
                       <div className="flex gap-3">
-                        <button className="button-primary">Save changes</button>
-                        <button
+                        <Button variant="default" className="button-primary">
+                          Save changes
+                        </Button>
+                        <Button
+                          variant="outline"
                           type="button"
                           className="button-secondary"
                           onClick={() => setAnalysisEdit(null)}
                         >
                           Cancel
-                        </button>
+                        </Button>
                       </div>
                     </form>
                   ) : (
@@ -1045,7 +1055,7 @@ export default function Workspace() {
                           </Disclosure>
                         ))}
                         <Disclosure title="Original source">
-                          <p className="whitespace-pre-wrap text-xs leading-6 text-muted">
+                          <p className="whitespace-pre-wrap text-xs leading-6 text-muted-foreground">
                             {draftRequirements.source.analyzedContent}
                           </p>
                         </Disclosure>
@@ -1057,7 +1067,8 @@ export default function Workspace() {
                         >
                           Confirm requirements
                         </Continue>
-                        <button
+                        <Button
+                          variant="outline"
                           className="button-secondary"
                           onClick={() => {
                             invalidate(2);
@@ -1071,7 +1082,7 @@ export default function Workspace() {
                           }}
                         >
                           Edit analysis
-                        </button>
+                        </Button>
                       </div>
                     </>
                   )}
@@ -1085,35 +1096,46 @@ export default function Workspace() {
                     description="PDF or DOCX, smaller than 5 MB. Your file is processed in memory."
                   >
                     <form onSubmit={upload} className="space-y-4">
-                      <label className="flex cursor-pointer flex-col items-center rounded-xl border border-dashed border-white/20 bg-black/10 px-5 py-7 text-center transition-colors hover:border-lime/50">
-                        <Upload className="mb-3 text-lime" size={24} />
-                        <span className="text-sm">
-                          {file ? file.name : "Choose your resume"}
-                        </span>
-                        <span className="mb-4 mt-2 text-xs text-muted">
-                          Text-based PDF or DOCX · No scanned documents
-                        </span>
-                        <input
-                          aria-label="Resume file"
-                          type="file"
-                          ref={fileInput}
-                          className="max-w-full text-xs text-muted file:mr-3 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-white"
-                          accept=".pdf,.docx"
-                          onChange={(e) => {
-                            invalidate(2);
-                            setFile(e.target.files?.[0] || null);
-                            setDraftCandidate(null);
-                            setCandidateEdit(null);
-                          }}
-                        />
-                      </label>
-                      <button
+                      <FileUploadCard
+                        files={
+                          file
+                            ? [
+                                {
+                                  id: "resume",
+                                  file,
+                                  status: busy.startsWith("Reading your resume")
+                                    ? "uploading"
+                                    : draftCandidate
+                                      ? "completed"
+                                      : notice?.type === "error"
+                                        ? "error"
+                                        : "selected",
+                                },
+                              ]
+                            : []
+                        }
+                        disabled={!!busy}
+                        onFilesChange={([nextFile]) => {
+                          invalidate(2);
+                          setFile(nextFile);
+                          setDraftCandidate(null);
+                          setCandidateEdit(null);
+                        }}
+                        onFileRemove={() => {
+                          invalidate(2);
+                          setFile(null);
+                          setDraftCandidate(null);
+                          setCandidateEdit(null);
+                        }}
+                      />
+                      <Button
+                        variant="default"
                         className="button-primary"
                         disabled={!file || !!busy}
                       >
                         Read resume
                         <ArrowRight size={15} />
-                      </button>
+                      </Button>
                     </form>
                     <div className="mt-6">
                       <Disclosure title="Enter your information manually">
@@ -1144,12 +1166,13 @@ export default function Workspace() {
                               setCandidateEdit(null);
                             }}
                           />
-                          <button
+                          <Button
+                            variant="outline"
                             className="button-secondary"
                             disabled={!!busy}
                           >
                             Build my profile
-                          </button>
+                          </Button>
                         </form>
                       </Disclosure>
                     </div>
@@ -1182,16 +1205,20 @@ export default function Workspace() {
                             onChange={setCandidateEdit}
                           />
                           <div className="flex gap-3">
-                            <button className="button-primary">
+                            <Button
+                              variant="default"
+                              className="button-primary"
+                            >
                               Save profile changes
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                              variant="outline"
                               type="button"
                               className="button-secondary"
                               onClick={() => setCandidateEdit(null)}
                             >
                               Cancel
-                            </button>
+                            </Button>
                           </div>
                         </form>
                       ) : (
@@ -1216,12 +1243,13 @@ export default function Workspace() {
                               </Disclosure>
                             ))}
                             <Disclosure title="Original resume text">
-                              <p className="whitespace-pre-wrap text-xs leading-6 text-muted">
+                              <p className="whitespace-pre-wrap text-xs leading-6 text-muted-foreground">
                                 {draftCandidate.source.originalResumeText}
                               </p>
                             </Disclosure>
                           </div>
-                          <button
+                          <Button
+                            variant="outline"
                             className="button-secondary mt-5"
                             onClick={() => {
                               invalidate(2);
@@ -1231,13 +1259,13 @@ export default function Workspace() {
                             }}
                           >
                             Edit profile
-                          </button>
+                          </Button>
                         </>
                       )}
                     </Panel>
                   )}
                   <Panel
-                    title="A little more context"
+                    title="Additional application details"
                     description="Optional details that can make your application more useful."
                   >
                     <Disclosure title="Availability, location & application details">
@@ -1286,7 +1314,7 @@ export default function Workspace() {
                               }));
                             }}
                           />
-                          <p className="text-xs leading-6 text-muted">
+                          <p className="text-xs leading-6 text-muted-foreground">
                             This is writing context only. Claims in a previous
                             email are not added to your candidate facts.
                           </p>
@@ -1300,7 +1328,8 @@ export default function Workspace() {
                       >
                         Confirm my profile
                       </Continue>
-                      <button
+                      <Button
+                        variant="outline"
                         className="button-secondary"
                         onClick={() => {
                           invalidate(2);
@@ -1316,7 +1345,7 @@ export default function Workspace() {
                         }}
                       >
                         Clear profile
-                      </button>
+                      </Button>
                     </div>
                   </Panel>
                 </>
@@ -1325,20 +1354,27 @@ export default function Workspace() {
                 <>
                   <Panel
                     icon={PenLine}
-                    title="Make it sound like you"
+                    title="Choose your writing preferences"
                     description="Choose your provider, set the tone, and shape your introduction."
                   >
                     <div className="space-y-5">
                       {providerState === "loading" ? (
-                        <p role="status" className="text-sm text-muted">
+                        <p
+                          role="status"
+                          className="text-sm text-muted-foreground"
+                        >
                           Checking available providers…
                         </p>
                       ) : providerState === "failed" ? (
-                        <p role="alert" className="text-sm text-red-200">
+                        <p role="alert" className="text-sm text-destructive">
                           Unable to check providers.{" "}
-                          <button className="underline" onClick={loadProviders}>
+                          <Button
+                            variant="ghost"
+                            className="underline"
+                            onClick={loadProviders}
+                          >
                             Try again
-                          </button>
+                          </Button>
                         </p>
                       ) : (
                         <>
@@ -1362,7 +1398,7 @@ export default function Workspace() {
                             ))}
                           </Field>
                           {preferences.provider === "ollama" && (
-                            <p className="text-xs leading-6 text-muted">
+                            <p className="text-xs leading-6 text-muted-foreground">
                               Local test model. Keep Ollama and the gateway
                               running (npm.cmd run llm). Generation may take a
                               few minutes; review the wording and facts before
@@ -1370,19 +1406,20 @@ export default function Workspace() {
                             </p>
                           )}
                           {!providers.some((p) => p.available) && (
-                            <p className="text-xs leading-6 text-muted">
+                            <p className="text-xs leading-6 text-muted-foreground">
                               No AI provider is configured. Add a cloud provider
                               key or OLLAMA_GATEWAY_API_KEY to the server
                               environment, then restart the app. Your reviewed
                               profiles remain available here.
                             </p>
                           )}
-                          <button
-                            className="text-xs text-muted underline underline-offset-4"
+                          <Button
+                            variant="ghost"
+                            className="text-xs text-muted-foreground underline underline-offset-4"
                             onClick={loadProviders}
                           >
                             Refresh provider availability
-                          </button>
+                          </Button>
                         </>
                       )}
                       <div className="grid gap-4 sm:grid-cols-2">
@@ -1434,13 +1471,14 @@ export default function Workspace() {
                           />
                         ),
                       )}
-                      <p className="text-xs leading-6 text-muted">
+                      <p className="text-xs leading-6 text-muted-foreground">
                         When you generate, relevant confirmed information is
                         sent to your selected AI provider. Nothing is sent to
                         the employer.
                       </p>
                       {!data.email && (
-                        <button
+                        <Button
+                          variant="default"
                           className="button-primary"
                           disabled={
                             !generationReady ||
@@ -1454,10 +1492,13 @@ export default function Workspace() {
                           {generationCount
                             ? `Generate again (${regenerationCount}/2)`
                             : "Generate application email"}
-                        </button>
+                        </Button>
                       )}
                       {!data.email && regenerationLimitReached && (
-                        <p role="status" className="text-xs text-muted">
+                        <p
+                          role="status"
+                          className="text-xs text-muted-foreground"
+                        >
                           {limitMessage}
                         </p>
                       )}
@@ -1494,7 +1535,7 @@ export default function Workspace() {
                         </Field>
                         {data.email.metadata?.usage && (
                           <p
-                            className="text-xs leading-6 text-muted"
+                            className="text-xs leading-6 text-muted-foreground"
                             aria-label="Generation usage"
                           >
                             {data.email.metadata.usage.reportedCalls > 0
@@ -1512,7 +1553,7 @@ export default function Workspace() {
                                 {" "}
                                 Remaining quota:{" "}
                                 <a
-                                  className="text-lime underline"
+                                  className="text-foreground underline"
                                   href="https://router.bynara.id/usage"
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -1555,7 +1596,7 @@ export default function Workspace() {
                           }}
                         />
                         {emailTyping && (
-                          <p role="status" className="text-xs text-lime">
+                          <p role="status" className="text-xs text-foreground">
                             Writing your email
                             <span className="subject-cursor" aria-hidden="true">
                               {" "}
@@ -1568,7 +1609,8 @@ export default function Workspace() {
                             className="flex flex-wrap justify-end gap-2"
                             aria-label="Email actions"
                           >
-                            <button
+                            <Button
+                              variant="default"
                               className="button-primary"
                               disabled={
                                 !generationReady || regenerationLimitReached
@@ -1582,24 +1624,26 @@ export default function Workspace() {
                             >
                               <RotateCcw size={13} /> Generate again (
                               {regenerationCount}/2)
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                              variant="outline"
                               className="button-secondary"
                               onClick={() => copy("subject")}
                             >
                               <Copy size={13} /> Copy subject
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                              variant="outline"
                               className="button-secondary"
                               onClick={() => copy("body")}
                             >
                               <Copy size={13} /> Copy email
-                            </button>
+                            </Button>
                           </div>
                         )}
                         {!emailTyping && !busy && (
                           <>
-                            <div className="space-y-3 rounded-lg border border-white/10 p-4">
+                            <div className="space-y-3 rounded-lg border border-border p-4">
                               <Field
                                 label="Regeneration feedback"
                                 multiline
@@ -1610,7 +1654,8 @@ export default function Workspace() {
                                 placeholder="Make it shorter, or add more about my Selenium experience?"
                                 disabled={regenerationLimitReached}
                               />
-                              <button
+                              <Button
+                                variant="outline"
                                 className="button-secondary"
                                 disabled={
                                   !feedback.trim() ||
@@ -1620,7 +1665,7 @@ export default function Workspace() {
                                 onClick={() => generate()}
                               >
                                 Regenerate with feedback
-                              </button>
+                              </Button>
                               <div
                                 className="flex flex-wrap gap-2"
                                 aria-label="One-click improvements"
@@ -1639,7 +1684,8 @@ export default function Workspace() {
                                     "Write a stronger, specific opening connecting my confirmed experience to this role. Avoid exaggeration and invented claims.",
                                   ],
                                 ].map(([label, instruction]) => (
-                                  <button
+                                  <Button
+                                    variant="outline"
                                     key={label}
                                     className="button-secondary !px-3 !py-2 !text-xs"
                                     disabled={
@@ -1649,10 +1695,10 @@ export default function Workspace() {
                                     onClick={() => generate(instruction)}
                                   >
                                     {label}
-                                  </button>
+                                  </Button>
                                 ))}
                               </div>
-                              <p className="text-xs leading-6 text-muted">
+                              <p className="text-xs leading-6 text-muted-foreground">
                                 Feedback and improvement chips use the same
                                 two-regeneration allowance. Metrics must come
                                 from your confirmed experience.
@@ -1663,7 +1709,7 @@ export default function Workspace() {
                               email={data.email}
                               onSave={saveCurrentEmail}
                             />
-                            <p className="text-xs leading-6 text-muted">
+                            <p className="text-xs leading-6 text-muted-foreground">
                               Save to History keeps this email on this browser
                               until you delete it. Unsaved versions clear on
                               refresh.
@@ -1674,14 +1720,15 @@ export default function Workspace() {
                           <p
                             id="regeneration-limit"
                             role="status"
-                            className="text-right text-xs text-muted"
+                            className="text-right text-xs text-muted-foreground"
                           >
                             {limitMessage}
                           </p>
                         )}
                         {emailEdited && (
-                          <button
-                            className="flex items-center gap-2 text-xs text-muted"
+                          <Button
+                            variant="ghost"
+                            className="flex items-center gap-2 text-xs text-muted-foreground"
                             onClick={() => {
                               setData((prev) => ({
                                 ...prev,
@@ -1692,9 +1739,9 @@ export default function Workspace() {
                           >
                             <RotateCcw size={12} />
                             Restore original draft
-                          </button>
+                          </Button>
                         )}
-                        <p className="text-xs leading-6 text-muted">
+                        <p className="text-xs leading-6 text-muted-foreground">
                           Review before sending and attach your resume yourself.
                           Editing does not use another generation. Save to
                           History or download a copy before refreshing.
@@ -1706,21 +1753,22 @@ export default function Workspace() {
               )}
               <SavedEmailHistory revision={historyRevision} />
               {stage > 0 && (
-                <button
-                  className="flex items-center gap-2 py-2 text-xs text-muted hover:text-white"
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 py-2 text-xs text-muted-foreground hover:text-foreground"
                   onClick={() => go(stage - 1)}
                 >
                   <ArrowLeft size={13} />
                   Back to {stages[stage - 1].name.toLowerCase()}
-                </button>
+                </Button>
               )}
             </div>
-            <aside className="space-y-5">
-              <div className="rounded-xl border border-white/10 p-5">
-                <p className="mb-5 text-[10px] font-semibold tracking-[.15em] text-muted">
+            <aside className="hidden space-y-5 2xl:block">
+              <div className="rounded-xl border border-border p-5">
+                <p className="mb-5 text-xs font-medium tracking-wide text-muted-foreground">
                   A BETTER FIRST IMPRESSION
                 </p>
-                <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-lime/10 text-lime">
+                <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-secondary text-foreground">
                   <current.icon size={19} />
                 </div>
                 <h2 className="mb-3 text-sm font-medium">
@@ -1733,7 +1781,7 @@ export default function Workspace() {
                     ][stage]
                   }
                 </h2>
-                <p className="text-xs leading-6 text-muted">
+                <p className="text-xs leading-6 text-muted-foreground">
                   {
                     [
                       "We read public job information. If a page is restricted, you can add the details manually.",
@@ -1745,18 +1793,18 @@ export default function Workspace() {
                 </p>
               </div>
               <div className="px-2">
-                <div className="mb-2 flex items-center gap-2 text-xs text-white/70">
-                  <CheckCheck size={14} className="text-lime" />
+                <div className="mb-2 flex items-center gap-2 text-xs text-foreground">
+                  <CheckCheck size={14} className="text-foreground" />
                   You review every step
                 </div>
-                <p className="text-[11px] leading-6 text-muted">
+                <p className="text-xs leading-6 text-muted-foreground">
                   Changing an earlier step clears later results, so your
                   application always reflects your latest information.
                 </p>
               </div>
             </aside>
           </div>
-          <footer className="mt-14 flex items-center justify-between border-t border-white/10 pt-6 text-[10px] text-muted">
+          <footer className="mt-14 flex items-center justify-between border-t border-border pt-6 text-xs text-muted-foreground">
             <span>HireDraft · Made for your next chapter</span>
             <span className="hidden sm:inline">
               One opportunity. One thoughtful introduction.

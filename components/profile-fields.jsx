@@ -1,6 +1,10 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { useId } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "@/components/ui/material-icons";
 
 export const humanize = (key) =>
   key
@@ -19,9 +23,9 @@ export function Field({
   const id = useId();
   return (
     <div>
-      <label className="field-label" htmlFor={id}>
+      <Label className="field-label" htmlFor={id}>
         {label}
-      </label>
+      </Label>
       {children ? (
         <select
           id={id}
@@ -33,7 +37,7 @@ export function Field({
           {children}
         </select>
       ) : multiline ? (
-        <textarea
+        <Textarea
           id={id}
           className="field min-h-28 resize-y"
           value={value ?? ""}
@@ -41,7 +45,7 @@ export function Field({
           {...props}
         />
       ) : (
-        <input
+        <Input
           id={id}
           className="field"
           value={value ?? ""}
@@ -57,16 +61,16 @@ export function Field({
 export function Evidence({ items = [] }) {
   if (!items.length) return null;
   return (
-    <details className="mt-2 text-xs text-muted">
-      <summary className="w-fit hover:text-lime">Source evidence</summary>
+    <details className="mt-2 text-xs text-muted-foreground">
+      <summary className="w-fit hover:text-foreground">Source evidence</summary>
       <div className="mt-2 space-y-2">
         {items.map((item, i) => (
           <blockquote
             key={i}
-            className="whitespace-pre-wrap border-l-2 border-lime/30 pl-3 leading-6"
+            className="whitespace-pre-wrap border-l-2 border-border pl-3 leading-6"
           >
             {item.text || item.value || "Confirmed profile fact"}
-            {item.context && <p className="text-white/40">{item.context}</p>}
+            {item.context && <p className="text-foreground">{item.context}</p>}
           </blockquote>
         ))}
       </div>
@@ -89,7 +93,7 @@ const omitted = new Set([
 ]);
 export function ProfileView({ value }) {
   if (value == null || value === "")
-    return <span className="text-xs text-muted">Not specified</span>;
+    return <span className="text-xs text-muted-foreground">Not specified</span>;
   if (typeof value !== "object")
     return (
       <span className="whitespace-pre-wrap break-words text-sm leading-6">
@@ -103,7 +107,7 @@ export function ProfileView({ value }) {
           {String(value.value)}
           {value.unit ? ` ${value.unit}` : ""}
         </span>
-        <span className="ml-2 text-[10px] text-lime/80">
+        <span className="ml-2 text-[10px] text-foreground">
           {value.source === "user_provided" || value.origin === "user"
             ? "User provided"
             : value.source === "calculated"
@@ -119,13 +123,13 @@ export function ProfileView({ value }) {
     return value.length ? (
       <div className="space-y-3">
         {value.map((item, i) => (
-          <div key={i} className="border-l border-white/10 pl-3">
+          <div key={i} className="border-l border-border pl-3">
             <ProfileView value={item} />
           </div>
         ))}
       </div>
     ) : (
-      <span className="text-xs text-muted">Not specified</span>
+      <span className="text-xs text-muted-foreground">Not specified</span>
     );
   return (
     <dl className="grid gap-4 sm:grid-cols-2">
@@ -141,7 +145,9 @@ export function ProfileView({ value }) {
                 : ""
             }
           >
-            <dt className="mb-1 text-[11px] text-muted">{humanize(key)}</dt>
+            <dt className="mb-1 text-[11px] text-muted-foreground">
+              {humanize(key)}
+            </dt>
             <dd>
               <ProfileView value={item} />
             </dd>
@@ -211,10 +217,10 @@ export function ProfileEditor({ value, onChange, name = "Profile" }) {
         />
       );
     return (
-      <fieldset className="space-y-4 rounded-lg border border-white/10 p-4">
+      <fieldset className="space-y-4 rounded-lg border border-border p-4">
         <legend className="px-2 text-sm font-medium">{humanize(name)}</legend>
         {value.map((item, i) => (
-          <div key={i} className="space-y-4 border-b border-white/10 pb-4">
+          <div key={i} className="space-y-4 border-b border-border pb-4">
             <ProfileEditor
               name={`${humanize(name)} ${i + 1}`}
               value={item}
@@ -222,17 +228,19 @@ export function ProfileEditor({ value, onChange, name = "Profile" }) {
                 onChange(value.map((x, j) => (j === i ? next : x)))
               }
             />
-            <button
+            <Button
+              variant="ghost"
               type="button"
-              className="inline-flex items-center gap-2 text-xs text-muted hover:text-red-300"
+              className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-destructive"
               onClick={() => onChange(value.filter((_, j) => j !== i))}
             >
               <Trash2 size={13} />
               Remove {humanize(name).toLowerCase()} {i + 1}
-            </button>
+            </Button>
           </div>
         ))}
-        <button
+        <Button
+          variant="outline"
           type="button"
           className="button-secondary !py-2 !text-xs"
           onClick={() =>
@@ -244,7 +252,7 @@ export function ProfileEditor({ value, onChange, name = "Profile" }) {
         >
           <Plus size={13} />
           Add {humanize(name).toLowerCase()}
-        </button>
+        </Button>
       </fieldset>
     );
   }

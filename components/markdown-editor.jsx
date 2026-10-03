@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import { useRef, useState, useId } from "react";
 import {
   Bold,
@@ -14,7 +15,7 @@ import {
   PenLine,
   Eye,
   Columns2,
-} from "lucide-react";
+} from "@/components/ui/material-icons";
 import MarkdownPreview from "./markdown-preview";
 import { markdownToText, plainToMarkdown } from "../src/markdown";
 
@@ -77,8 +78,9 @@ export default function MarkdownEditor({
         <label className="field-label !mb-0" htmlFor={id}>
           Email body
         </label>
-        <button
-          className="text-xs text-lime underline"
+        <Button
+          variant="ghost"
+          className="text-xs text-foreground underline"
           disabled={readOnly}
           onClick={() =>
             update(
@@ -88,7 +90,7 @@ export default function MarkdownEditor({
           }
         >
           {markdown ? "Use plain text" : "Use Markdown editor"}
-        </button>
+        </Button>
       </div>
       {markdown && (
         <>
@@ -102,14 +104,15 @@ export default function MarkdownEditor({
               ["Preview", Eye],
               ["Split", Columns2],
             ].map(([view, Icon]) => (
-              <button
+              <Button
+                variant="outline"
                 key={view}
                 className="button-secondary !px-3 !py-2 !text-xs"
                 aria-pressed={mode === view}
                 onClick={() => setMode(view)}
               >
                 <Icon size={14} aria-hidden="true" /> {view}
-              </button>
+              </Button>
             ))}
           </div>
           <div
@@ -127,7 +130,8 @@ export default function MarkdownEditor({
               ["Quote", "> ", "", true, Quote],
               ["Code", "`", "`", false, Code],
             ].map(([label, before, after, line, Icon]) => (
-              <button
+              <Button
+                variant="outline"
                 key={label}
                 title={label}
                 aria-label={label}
@@ -139,7 +143,7 @@ export default function MarkdownEditor({
               >
                 <Icon size={15} aria-hidden="true" />
                 <span className="sr-only">{label}</span>
-              </button>
+              </Button>
             ))}
           </div>
         </>
@@ -176,34 +180,36 @@ export default function MarkdownEditor({
           />
         )}
         {markdown && mode !== "Write" && (
-          <div className="min-w-0 rounded-lg border border-white/10 bg-black/10 p-4">
+          <div className="min-w-0 rounded-lg border border-border bg-secondary p-4">
             <MarkdownPreview source={value} />
           </div>
         )}
       </div>
       <div className="flex gap-2">
         {" "}
-        <button
+        <Button
+          variant="outline"
           className="button-secondary !px-2.5 !py-1.5 !text-xs"
           disabled={readOnly || !undo.length}
           onClick={() => travel(true)}
         >
           <Undo2 size={14} aria-hidden="true" /> Undo
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           className="button-secondary !px-2.5 !py-1.5 !text-xs"
           disabled={readOnly || !redo.length}
           onClick={() => travel(false)}
         >
           <Redo2 size={14} aria-hidden="true" /> Redo
-        </button>
+        </Button>
       </div>
-      <p className="text-xs text-muted">
+      <p className="text-xs text-muted-foreground">
         {plain.trim() ? plain.trim().split(/\s+/).length : 0} words ·{" "}
         {value.length}/10,000 characters{markdown ? " · Markdown enabled" : ""}
       </p>
       {markdown && (
-        <details className="text-xs leading-6 text-muted">
+        <details className="text-xs leading-6 text-muted-foreground">
           <summary className="cursor-pointer">
             Markdown help & shortcuts
           </summary>

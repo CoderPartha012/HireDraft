@@ -1,47 +1,43 @@
-﻿# ✉️ HireDraft
+# ✉️ HireDraft
 
 **From job description to your first draft.**
 
 HireDraft turns a job opportunity and your resume into an application email you can review, edit, and export. A four-step workspace brings together job requirements, your experience, and writing preferences.
 
-Built with **Next.js 16 · React 19 · Tailwind CSS 4 · Motion**.
+Built with **Next.js 16 · React 19 · Tailwind CSS 4 · shadcn/ui**.
 
-[🎬 Watch the demo](public/demo/hiredraft-live-demo.webm) · [🚀 Run locally](#-run-locally) · [🧭 Explore the workflow](#-the-four-step-workflow) · [🛠️ Development](#-development)
+[Run locally](#-run-locally) | [Explore the workflow](#-the-four-step-workflow) | [UI component sources](docs/UI_COMPONENTS.md)
 
-## 🎬 See the real workflow
+## Project documentation
 
-[![HireDraft workspace showing an application email generated from a sample job and resume](public/demo/hiredraft-live-demo-poster.png)](public/demo/hiredraft-live-demo.webm)
+| Document                                      | Contents                                                                                  |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [Technical Requirement Document](TRD.md)      | Architecture, functional requirements, data contracts, APIs, providers and system limits. |
+| [App Flow](App_Flow.md)                       | User journey, confirmation gates, generation checks, revisions and recovery flows.        |
+| [Implementation Plan](Implementation_Plan.md) | Delivered baseline, proposed phases, acceptance criteria and release workflow.            |
+| [Testing Guide](TESTING.md)                   | Test commands, coverage map, responsive checks, manual scenarios and troubleshooting.     |
 
-**Click the image to open the 73-second product demo.** In the running app, select **Watch the real demo** on the homepage.
+## Minimal SaaS interface
 
-The recording uses a fictional job and sample resume, with an email generated live by Bynara through the actual workspace. It shows job entry, requirements review, resume upload, profile confirmation, email generation, and saving the draft. Processing time is included; results and timing vary.
+HireDraft uses locally loaded Geist Sans with neutral light and dark themes, simple navigation, and consistent form controls. The sun/moon icon in the header switches themes and remembers your choice across pages and visits. On your first visit, the site opens in dark mode. Your chosen theme is remembered. The homepage explains the workflow with a static email preview, switchable examples, supported sources, and an accessible FAQ accordion.
 
-- ▶️ Playback controls and inline mobile playback.
-- 💬 English captions and on-screen instructions; no audio is required.
-- 🖼️ Updated poster showing the generated email.
-- 📖 Expandable written walkthrough and a video download fallback.
-- 📱 Responsive player with a direct link to try the workspace.
+The application workspace, editor, saved history, and information pages use the same visual language. Demo videos, the animated background, decorative text effects, and their unused assets have been removed.
 
-| Demo asset       | File                                                                         |
-| ---------------- | ---------------------------------------------------------------------------- |
-| Recording        | [hiredraft-live-demo.webm](public/demo/hiredraft-live-demo.webm)             |
-| Poster           | [hiredraft-live-demo-poster.png](public/demo/hiredraft-live-demo-poster.png) |
-| English captions | [hiredraft-live-demo.vtt](public/demo/hiredraft-live-demo.vtt)               |
-| Chapter timings  | [chapters.json](public/demo/chapters.json)                                   |
+Components are built with **shadcn/ui (Radix Nova)**. The FAQ uses a **ReUI accordion discovered on 21st.dev**, adapted from its public upstream source. See [component sources and attribution](docs/UI_COMPONENTS.md).
 
 ## ✨ Latest updates
 
 | Area                   | What changed                                                                                                                                   |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🎥 Homepage demo       | Replaced the illustrative-response walkthrough with a real, approximately 73-second recording of the application workflow.                     |
+| 🎥 Homepage preview    | Replaced the video section with a static, readable email preview.                                                                              |
 | 🧭 Simpler workflow    | Profile confirmation leads directly to email generation. Experience matching happens within the workflow, without a separate alignment screen. |
 | ✍️ Drafting experience | Generated text appears with a typing effect, with an instant reveal for reduced-motion preferences.                                            |
 | 🔄 Draft revisions     | Switch between Generation 1–3, preserve edits, and refine drafts with feedback or quick suggestions.                                           |
 | 📝 Markdown editor     | Write, Preview, and Split views with formatting icons, undo/redo, shortcuts, and word counts.                                                  |
 | 📤 Export options      | Copy the subject or body, download text, Word, or Markdown, and open a Gmail compose window.                                                   |
 | 🗂️ Saved History       | Save up to 30 email snapshots in the current browser and reopen or delete them later.                                                          |
-| 💡 Status feedback     | Document-scan loading animations, generation progress, and dismissible notifications for copy, export, and history actions.                    |
-| 🎨 Landing page        | Responsive dark styling, animated sections, three switchable application examples, supported-source guidance, FAQs, and informational pages.   |
+| 💡 Status feedback     | Compact loading indicators, generation progress, and dismissible notifications for copy, export, and history actions.                          |
+| 🎨 Landing page        | Responsive neutral styling, clear sections, three switchable application examples, supported-source guidance, FAQs, and informational pages.   |
 
 ## 🧭 The four-step workflow
 
@@ -68,7 +64,7 @@ Gmail opens a compose window for your final review. Add the recipient and any at
 - **Version history:** Switch between generated versions while preserving manual edits.
 - **Usage display:** See reported token usage and the number of generation calls when available.
 
-The provider selector includes **Bynara**, **APInex**, and **Ollama · local test**. Actual availability depends on the running installation and the selected service.
+The provider selector includes **Byanara AI**, **APInex**, and **Ollama · local test**. **Byanara AI is selected by default** and uses the existing Bynara gateway (`bynara`, model `agnes-2.5-flash`). Actual availability depends on the configured server credentials and the selected service; generation remains disabled when the selected provider is unavailable.
 
 ### Markdown editing
 
@@ -88,7 +84,7 @@ The preview supports GitHub-flavored Markdown, including tables and task lists. 
 
 ## 🎨 Pages and interface
 
-The homepage includes the product demo, three fictional application examples with their job requirements and resume evidence, workflow cards, feature descriptions, supported sources, and FAQs.
+The homepage includes a static email preview, three fictional application examples with their job requirements and resume evidence, four workflow steps, supported sources, and FAQs.
 
 Public LinkedIn links support extraction. Content from other sources can be entered manually. The interface includes responsive layouts, keyboard focus states, accessible labels, and reduced-motion support.
 
@@ -107,6 +103,20 @@ Requires **Node.js 22.13 or newer** and npm.
 
 ```sh
 npm install
+```
+
+Copy `.env.example` to `.env` and configure at least one AI provider before generating emails:
+
+| Variable                  | Purpose                                           |
+| ------------------------- | ------------------------------------------------- |
+| `BYNARA_API_KEY`          | Enables the default Byanara AI provider.          |
+| `APINEX_API_KEY`          | Enables APInex as an alternative provider.        |
+| `OLLAMA_GATEWAY_API_KEY`  | Enables the authenticated local Ollama gateway.   |
+| `HIREDRAFT_CONTACT_EMAIL` | Optional support email shown on the Contact page. |
+
+Keep provider credentials on the server. Restart the app after changing `.env`. If Bynara asks you to link Telegram, complete that step in its account settings before retrying. For Ollama setup, see [the local gateway guide](llm-gateway/README.md); `npm run llm` starts an already configured Windows gateway environment.
+
+```sh
 npm run dev
 ```
 
@@ -121,6 +131,22 @@ npm start
 
 On Windows PowerShell, use `npm.cmd` if the `npm` command is unavailable.
 
+## Responsive review
+
+Reviewed on **3 October 2026** against a production build in Google Chrome using Playwright viewport emulation.
+
+Validation: `npm run build` succeeded and the full `npm run test:e2e` suite passed **25 tests**. The review includes automated overflow checks and visual inspection of representative mobile, tablet, and desktop screenshots.
+
+| Area                             | Coverage                                                                                                                            | Result                                                                     |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Public pages and workspace entry | Homepage, workspace, About, Contact, Privacy, Terms, and 404 at 320, 390, 640, 768, 1024, 1280, and 1440px in light and dark themes | No page-level horizontal overflow or client errors in the viewport matrix. |
+| Application workflow             | All four steps, generated draft, Markdown editor, and saved-history controls at 320, 390, 768, 1024, and 1440px                     | Layouts fit the viewport, including long links and Markdown tables.        |
+| Navigation and accessibility     | Mobile menu, Escape dismissal, keyboard links, FAQ tabs, example selection, theme persistence, and reduced-motion behavior          | Covered by browser regression tests.                                       |
+
+Review screenshots are generated in `test-results/` and are not committed. The layout stacks on smaller screens, uses a sidebar on desktop, and wraps editor and export controls. No responsiveness fixes were needed in this review.
+
+This review uses Chrome emulation rather than physical devices. Safari, Firefox, and real-device behavior have not been verified. Draft generation uses fixture responses in browser tests, so this review does not confirm live provider availability.
+
 ## 🛠️ Development
 
 ### Project structure
@@ -130,8 +156,7 @@ app/                   Pages, layouts, styles, and route handlers
 components/            Homepage, workspace, editors, exports, and history UI
 src/                   Job parsing, requirements, profiles, and matching logic
 src/server/            Job extraction, resume reading, and email generation
-public/demo/           Homepage recording, poster, captions, and chapter timings
-scripts/               Demo recording and development utilities
+scripts/               Development and verification utilities
 tests/                Domain and application regression tests
 tests/legacy/         Original interface fixtures for regression coverage
 e2e/                   Playwright browser tests and sample fixtures
@@ -153,29 +178,14 @@ The app uses the Next.js App Router, React state, and shared JavaScript modules,
 | `npm run test:e2e`  | Run browser tests against the production build.     |
 | `npm run format`    | Format the configured source directories and files. |
 
-Browser tests use installed **Google Chrome** and start the production build on port **3100**. Build the app before running them. The tests use sample job and generation responses; the homepage demo recorder uses live generation.
+Browser tests use installed **Google Chrome** and start the production build on port **3100**. Build the app before running them. The tests use sample job and generation responses.
 
-### Record an updated demo
+To repeat the responsive page matrix and workspace review:
 
-The recorder in [scripts/record-product-demo.mjs](scripts/record-product-demo.mjs) drives the real interface, uploads the sample resume, generates an email, and saves the result through the workspace.
-
-With the app running and a working provider available, run these commands in PowerShell:
-
-```powershell
-$env:DEMO_BASE_URL = 'http://localhost:3000'
-$env:DEMO_PROVIDER = 'bynara'
-node scripts/record-product-demo.mjs
+```sh
+npm run build
+npm run test:e2e -- e2e/responsive.spec.js e2e/navigation.spec.js e2e/theme.spec.js
+npm run test:e2e -- e2e/workspace.spec.js --grep "all workspace steps"
 ```
-
-The script stages the recording, poster, captions, and chapter timings in `test-results/demo-recording/publish/`. A failed generation does not replace the homepage video. Review playback and caption timing, then copy the reviewed assets into `public/demo/` to update the homepage.
-
-### Latest demo verification
-
-The September 24, 2026 demo update was checked for:
-
-- Successful live email generation through Bynara and saving through the workspace.
-- Homepage playback: **72.8 seconds**, **1280 × 900**, and **9 caption cues**.
-- Mobile layout at **390 px** wide with no horizontal overflow.
-- Passing TypeScript checks and recorder syntax validation.
 
 Use a Node.js-capable Next.js host when deploying; the application requires server-side processing for extraction, resume reading, and generation.

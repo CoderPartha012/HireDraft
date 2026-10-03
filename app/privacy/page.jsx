@@ -22,14 +22,14 @@ export default function Privacy() {
           Workspace information is held in the current browser session’s memory.
           Refreshing or starting a new application clears unsaved information.
           If you choose Save to History, the selected email subject and body,
-          body format, generation number, edited status, and save date are retained in this
-          browser’s local storage. Up to 30 saved emails remain until you delete
-          them in Saved History or clear this site’s browser data. They are not
-          synced across devices; anyone using this browser profile may access
-          them. Job profiles and resume files are not included in saved history.
-          Uploaded resumes are processed in server memory rather than saved as
-          files. Copies you download, copy, or send outside HireDraft remain
-          under your control.
+          body format, generation number, edited status, and save date are
+          retained in this browser’s local storage. Up to 30 saved emails remain
+          until you delete them in Saved History or clear this site’s browser
+          data. They are not synced across devices; anyone using this browser
+          profile may access them. Job profiles and resume files are not
+          included in saved history. Uploaded resumes are processed in server
+          memory rather than saved as files. Copies you download, copy, or send
+          outside HireDraft remain under your control.
         </p>
       </section>
       <section>

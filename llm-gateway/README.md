@@ -26,16 +26,18 @@ Open http://localhost:3000, review the job and resume, then select **Ollama · l
 under **AI provider** in the email step and generate the email. Ollama must be running.
 Restart Next.js after changing `.env` so it loads the gateway credential.
 
-This machine has a dedicated `hiredraft-local` gateway user whose key is configured in the
-private root `.env` as `OLLAMA_GATEWAY_API_KEY`. It is used only by the Next.js server.
-To block/allow this integration, run from `llm-gateway`:
+Create a dedicated gateway user for your own installation and configure its credential
+in the private root `.env` as `OLLAMA_GATEWAY_API_KEY`. It is used only by the Next.js
+server. Do not publish the user identity, generated key, or local access database.
+To block/allow the integration, run from `llm-gateway`, replacing the example name with
+the user you created:
 
 ```powershell
-.\.venv\Scripts\python.exe manage.py disable hiredraft-local
-.\.venv\Scripts\python.exe manage.py enable hiredraft-local
+.\.venv\Scripts\python.exe manage.py disable example-user
+.\.venv\Scripts\python.exe manage.py enable example-user
 ```
 
-This is one shared local-test identity for the website, not per-visitor authentication.
+This setup uses one shared local-test identity for the website, not per-visitor authentication.
 Use only on your own machine until real application sign-in is integrated. The model is
 small and can produce weak drafts or fail HireDraft's existing factual verification;
 those checks remain enabled. Longer contexts above the local limit return a clear error.
