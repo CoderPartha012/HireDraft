@@ -37,7 +37,11 @@ export async function requestAI(
   {
     env = process.env,
     fetchImpl = fetch,
-    timeout = provider === "ollama" ? 125000 : 55000,
+    timeout = provider === "ollama"
+      ? 125000
+      : provider === "bynara"
+        ? 110000
+        : 55000,
   } = {},
 ) {
   const config = providers[provider];
@@ -73,7 +77,14 @@ export async function requestAI(
                   },
                 },
               }
-            : {}),
+            : provider === "bynara"
+              ? {
+                  max_tokens: 2048,
+                  temperature: 0.2,
+                  reasoning_effort: "none",
+                  response_format: { type: "json_object" },
+                }
+              : {}),
           messages: [
             {
               role: "system",

@@ -14,6 +14,36 @@ const draft = {
 const reply = (content, finish_reason = "stop") =>
   Response.json({ choices: [{ finish_reason, message: { content } }] });
 
+test("Bynara has enough time for full drafts and bounds its output budget", async (t) => {
+  const deadlines = [];
+  t.mock.method(AbortSignal, "timeout", (milliseconds) => {
+    deadlines.push(milliseconds);
+    return new AbortController().signal;
+  });
+  const result = await requestAI(
+    {
+      provider: "bynara",
+      system: "Use only confirmed facts.",
+      data: {},
+      schema: { type: "object" },
+    },
+    {
+      env: { BYNARA_API_KEY: "test-credential" },
+      fetchImpl: async (_url, init) => {
+        const payload = JSON.parse(init.body);
+        assert.equal(payload.max_tokens, 2048);
+        assert.equal(payload.reasoning_effort, "none");
+        assert.deepEqual(payload.response_format, { type: "json_object" });
+        assert.equal(payload.temperature, 0.2);
+        assert.equal(init.signal.aborted, false);
+        return reply(JSON.stringify(draft));
+      },
+    },
+  );
+  assert.deepEqual(deadlines, [110000]);
+  assert.deepEqual(result.value, draft);
+});
+
 test("Ollama uses the authenticated local gateway with structured output", async () => {
   const schema = {
     type: "object",
@@ -75,7 +105,10 @@ for (const [provider, key, model, host] of [
           assert.equal(init.headers.Authorization, "Bearer secret");
           const body = JSON.parse(init.body);
           assert.equal(body.model, model);
-          assert.equal(body.response_format, undefined);
+          assert.deepEqual(
+            body.response_format,
+            provider === "bynara" ? { type: "json_object" } : undefined,
+          );
           assert.match(body.messages[0].content, /JSON schema/);
           assert.ok(!init.body.includes("secret"));
           return reply(JSON.stringify(draft));
